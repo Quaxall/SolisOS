@@ -38,3 +38,25 @@ gnome-software-plugin-flatpak
 # Kurulum Aracı
 calamares
 calamares-settings-ubuntu
+
+# ─── Faz 3 Standalone Sistem Uygulamaları ───
+# E-Posta İstemcisi
+geary
+
+# Modern Win11 Tarzı Not Defteri
+gnome-text-editor
+
+# Takvim
+gnome-calendar
+
+# Görsel Görüntüleyici (Fotoğraflar)
+loupe
+
+# Saat, Kronometre ve Dünya Saatleri
+gnome-clocks
+
+# Hava Durumu
+gnome-weather
+
+# Güç Yönetimi
+power-profiles-daemon

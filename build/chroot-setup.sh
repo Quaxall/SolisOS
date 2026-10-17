@@ -12,6 +12,7 @@ export LANG=C.UTF-8
 
 CONFIG_DIR="/tmp/solis-config"
 BRANDING_DIR="/tmp/solis-branding"
+PACKAGES_DIR="/tmp/solis-packages"
 
 # ─── Renk Kodları ───
 GREEN='\033[0;32m'
@@ -460,14 +461,37 @@ chmod +x /usr/local/bin/solis-theme
 log_sub "Windows 11 panel, Whisker menü ve tema yapılandırması tamamlandı."
 
 # ═══════════════════════════════════════════════════════════════════
-# 10. LightDM ve Otomatik Giriş (Autologin) Yapılandırması
+# 10. Wayland KWin & Görüntü Yöneticisi (SDDM / LightDM Autologin)
 # ═══════════════════════════════════════════════════════════════════
 
-log_sub "LightDM ve otomatik giriş (Live Desktop) yapılandırılıyor..."
+log_sub "Wayland mimarisi ve otomatik giriş yapılandırılıyor..."
 
+# ─── KWin Wayland Yapılandırması (Akıcı Animasyonlar & Acrylic Blur) ───
+if [ -d "${CONFIG_DIR}/kwin" ]; then
+    mkdir -p /etc/xdg
+    mkdir -p "${SKEL}/.config"
+    cp -r "${CONFIG_DIR}/kwin/"* /etc/xdg/ 2>/dev/null || true
+    cp -r "${CONFIG_DIR}/kwin/"* "${SKEL}/.config/" 2>/dev/null || true
+    log_sub "  ✅ KWin Wayland Glide/Scale ve Akrilik efektleri uygulandı."
+fi
+
+# ─── SDDM Yapılandırması (Varsayılan Wayland Giriş Yöneticisi) ───
+mkdir -p /etc/sddm.conf.d
+if [ -f "${CONFIG_DIR}/sddm/autologin.conf" ]; then
+    cp "${CONFIG_DIR}/sddm/autologin.conf" /etc/sddm.conf.d/autologin.conf
+fi
+
+# SDDM kuruluysa varsayılan yap
+if command -v sddm &>/dev/null; then
+    log_sub "  ✅ SDDM Wayland görüntü yöneticisi etkinleştiriliyor..."
+    systemctl set-default graphical.target 2>/dev/null || true
+    systemctl enable sddm 2>/dev/null || true
+    echo "/usr/bin/sddm" > /etc/X11/default-display-manager 2>/dev/null || true
+fi
+
+# ─── LightDM Yedek Yapılandırması (Wayland Oturumu Destekli) ───
 mkdir -p /etc/lightdm/lightdm.conf.d
 
-# LightDM GTK Greeter yapılandırması
 cat > /etc/lightdm/lightdm-gtk-greeter.conf << 'EOF'
 [greeter]
 theme-name = Fluent-round-Dark
@@ -484,26 +508,24 @@ position = 50%,center 50%,center
 panel-position = bottom
 EOF
 
-# Canlı oturum otomatik giriş ayarı (Hem Seat:* hem SeatDefaults desteklenir)
 cat > /etc/lightdm/lightdm.conf << 'EOF'
 [Seat:*]
 autologin-guest = false
 autologin-user = solis
 autologin-user-timeout = 0
-autologin-session = xfce
-user-session = xfce
+autologin-session = plasmawayland
+user-session = plasmawayland
 greeter-session = lightdm-gtk-greeter
 
 [SeatDefaults]
 autologin-guest = false
 autologin-user = solis
 autologin-user-timeout = 0
-autologin-session = xfce
-user-session = xfce
+autologin-session = plasmawayland
+user-session = plasmawayland
 greeter-session = lightdm-gtk-greeter
 EOF
 
-# PAM autologin yapılandırması (şifresiz masaüstüne düşüş için zorunlu)
 cat > /etc/pam.d/lightdm-autologin << 'EOF'
 #%PAM-1.0
 auth      requisite pam_nologin.so
@@ -517,40 +539,103 @@ session   optional  pam_keyinit.so force revoke
 @include common-password
 EOF
 
-# Grafik hedefini varsayılan yap ve LightDM'i etkinleştir
-systemctl set-default graphical.target 2>/dev/null || true
-systemctl enable lightdm 2>/dev/null || true
-
 # ═══════════════════════════════════════════════════════════════════
 # 11. Canlı Oturum Kullanıcısı (solis) Oluşturma ve Hazırlama
 # ═══════════════════════════════════════════════════════════════════
 
 log_sub "Canlı oturum kullanıcısı (solis) yapılandırılıyor..."
 
-# Autologin gruplarını oluştur
 groupadd -r autologin 2>/dev/null || true
 groupadd -r nopasswdlogin 2>/dev/null || true
 
-# solis kullanıcısını oluştur
 useradd -m -s /bin/bash -G sudo,audio,video,plugdev,netdev,bluetooth,lpadmin,autologin,nopasswdlogin solis 2>/dev/null || true
 usermod -a -G autologin,nopasswdlogin,sudo solis 2>/dev/null || true
 
-# Şifresiz sudo yetkisi
 echo "solis ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/solis
 chmod 440 /etc/sudoers.d/solis
-
-# Şifresiz giriş
 passwd -d solis 2>/dev/null || true
 
-# Doğrudan XFCE oturumuna başlama dosyası (.xsession)
-echo "exec startxfce4" > /home/solis/.xsession
+# Wayland oturum başlatıcı (.xsession fallback)
+cat > /home/solis/.xsession << 'EOF'
+if command -v startplasma-wayland &>/dev/null; then
+    exec startplasma-wayland
+else
+    exec startxfce4
+fi
+EOF
 chmod +x /home/solis/.xsession
+
+# ═══════════════════════════════════════════════════════════════════
+# 11b. Standalone Sistem Uygulamaları (LocalSend & Obsidian)
+# ═══════════════════════════════════════════════════════════════════
+
+log_sub "Standalone uygulamalar (LocalSend & Obsidian) indiriliyor ve kuruluyor..."
+
+# 1. LocalSend (.deb)
+LOCALSEND_URL="https://github.com/localsend/localsend/releases/download/v1.14.0/LocalSend-1.14.0-linux-x86-64.deb"
+if curl -fsSL -o /tmp/localsend.deb "$LOCALSEND_URL" 2>/dev/null || wget -q -O /tmp/localsend.deb "$LOCALSEND_URL" 2>/dev/null; then
+    dpkg -i /tmp/localsend.deb 2>/dev/null || apt-get install -f -y 2>/dev/null || true
+    rm -f /tmp/localsend.deb
+    log_sub "  ✅ LocalSend başarıyla kuruldu."
+else
+    log_sub "  ⚠️ LocalSend paketi indirilemedi (ağ gereksinimi)."
+fi
+
+# 2. Obsidian (.deb)
+OBSIDIAN_URL="https://github.com/obsidianmd/obsidian-releases/releases/download/v1.5.12/obsidian_1.5.12_amd64.deb"
+if curl -fsSL -o /tmp/obsidian.deb "$OBSIDIAN_URL" 2>/dev/null || wget -q -O /tmp/obsidian.deb "$OBSIDIAN_URL" 2>/dev/null; then
+    dpkg -i /tmp/obsidian.deb 2>/dev/null || apt-get install -f -y 2>/dev/null || true
+    rm -f /tmp/obsidian.deb
+    log_sub "  ✅ Obsidian başarıyla kuruldu."
+else
+    log_sub "  ⚠️ Obsidian paketi indirilemedi (ağ gereksinimi)."
+fi
+
+# ═══════════════════════════════════════════════════════════════════
+# 11c. Solis OS Özel WinUI 3 Araçları (Welcome Center & SolisOptimizer)
+# ═══════════════════════════════════════════════════════════════════
+
+log_sub "Solis OS özel WinUI 3 sistem araçları kuruluyor..."
+
+# Solis Welcome Center
+if [ -f "${PACKAGES_DIR}/solis-welcome/src/main.py" ]; then
+    mkdir -p /usr/share/solis-welcome
+    cp "${PACKAGES_DIR}/solis-welcome/src/main.py" /usr/local/bin/solis-welcome
+    chmod +x /usr/local/bin/solis-welcome
+    
+    if [ -f "${PACKAGES_DIR}/solis-welcome/solis-welcome.desktop" ]; then
+        cp "${PACKAGES_DIR}/solis-welcome/solis-welcome.desktop" /usr/share/applications/
+        mkdir -p "${SKEL}/.config/autostart"
+        cp "${PACKAGES_DIR}/solis-welcome/solis-welcome.desktop" "${SKEL}/.config/autostart/"
+    fi
+    log_sub "  ✅ Solis Welcome Center kuruldu ve autostart'a bağlandı."
+fi
+
+# SolisOptimizer
+if [ -f "${PACKAGES_DIR}/solis-optimizer/src/main.py" ]; then
+    mkdir -p /usr/share/solis-optimizer
+    cp "${PACKAGES_DIR}/solis-optimizer/src/main.py" /usr/local/bin/solis-optimizer
+    chmod +x /usr/local/bin/solis-optimizer
+    
+    if [ -f "${PACKAGES_DIR}/solis-optimizer/solis-optimizer.desktop" ]; then
+        cp "${PACKAGES_DIR}/solis-optimizer/solis-optimizer.desktop" /usr/share/applications/
+    fi
+    log_sub "  ✅ SolisOptimizer başarıyla kuruldu."
+fi
+
+# Şifresiz RAM Temizleme Yardımcısı
+cat > /usr/local/bin/solis-ram-clean << 'EOF'
+#!/bin/bash
+sync
+echo 3 > /proc/sys/vm/drop_caches
+EOF
+chmod +x /usr/local/bin/solis-ram-clean
 
 # /etc/skel şablonunu kullanıcının ev dizinine kopyala ve izinleri ata
 cp -r "${SKEL}/." /home/solis/
 chown -R solis:solis /home/solis/
 
-log_sub "Canlı oturum ve otomatik masaüstü girişi başarıyla hazırlandı."
+log_sub "Canlı oturum, Wayland ve standalone uygulamalar başarıyla hazırlandı."
 
 # ═══════════════════════════════════════════════════════════════════
 # 12. Flatpak Depoları

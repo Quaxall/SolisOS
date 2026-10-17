@@ -3,7 +3,7 @@
 # Minimal XFCE4 kurulumu + Win11 düzeni için
 # ─────────────────────────────────────────────
 
-# XFCE Çekirdek
+# XFCE & Plasma Çekirdek
 xfce4-session
 xfwm4
 xfce4-panel
@@ -12,6 +12,18 @@ xfce4-settings
 xfce4-power-manager
 xfce4-appfinder
 xfce4-notifyd
+
+# ─── Faz 3 Wayland & KWin Compositor (Akıcı Animasyonlar & Acrylic Blur) ───
+plasma-workspace-wayland
+plasma-desktop
+kwin-wayland
+kwin-wayland-backend-drm
+sddm
+xdg-desktop-portal-kde
+qt6-wayland
+pipewire-pulse
+wireplumber
+
 
 # Dosya Yöneticisi
 thunar

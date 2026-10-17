@@ -187,10 +187,11 @@ cp "${PROJECT_DIR}/build/chroot-setup.sh" "${ROOTFS_DIR}/tmp/chroot-setup.sh"
 chmod +x "${ROOTFS_DIR}/tmp/chroot-setup.sh"
 
 # ─── Yapılandırma dosyalarını kopyala ───
-log_info "Yapılandırma dosyaları rootfs'e kopyalanıyor..."
+log_info "Yapılandırma dosyaları ve Solis paketleri rootfs'e kopyalanıyor..."
 mkdir -p "${ROOTFS_DIR}/tmp/solis-config"
 cp -r "${PROJECT_DIR}/config/"* "${ROOTFS_DIR}/tmp/solis-config/"
 cp -r "${PROJECT_DIR}/branding" "${ROOTFS_DIR}/tmp/solis-branding"
+cp -r "${PROJECT_DIR}/packages" "${ROOTFS_DIR}/tmp/solis-packages"
 
 # ─── Chroot içi kurulumu çalıştır ───
 log_info "Chroot içi kurulum başlatılıyor... (Bu adım 10-30 dakika sürebilir)"

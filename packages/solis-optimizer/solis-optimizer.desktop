@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=SolisOptimizer
+GenericName=Sistem ve Bellek Optimize Edici
+Comment=Solis OS RAM temizleme ve sistem optimizasyon aracı
+Exec=/usr/local/bin/solis-optimizer
+Icon=utilities-system-monitor
+Terminal=false
+Categories=System;Monitor;Settings;
+Keywords=optimize;clean;ram;memory;speed;
+StartupNotify=true

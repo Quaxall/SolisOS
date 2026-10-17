@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Solis Hoş Geldiniz
+GenericName=Sistem Karşılama Merkezi
+Comment=Solis OS Hoş Geldiniz ve Sistem Kontrol Merkezi
+Exec=/usr/local/bin/solis-welcome
+Icon=solis-logo
+Terminal=false
+Categories=System;Settings;Utility;
+Keywords=welcome;solis;settings;appearance;theme;
+StartupNotify=true

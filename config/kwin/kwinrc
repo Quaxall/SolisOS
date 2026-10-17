@@ -1,0 +1,75 @@
+# ═══════════════════════════════════════════════════════════════════
+# ☀️ Solis OS — KWin Wayland Compositor Yapılandırması
+# Windows 11 Akıcı Animasyonlar (Glide/Scale), Akrilik Blur & Tiling
+# ═══════════════════════════════════════════════════════════════════
+
+[Compositing]
+Backend=OpenGL
+GLCore=true
+GLPlatformInterface=egl
+GLPreferBufferSwap=a
+HiddenPreviews=5
+OpenGLIsUnsafe=false
+WindowsBlockCompositing=true
+MaxFPS=144
+
+[Plugins]
+blurEnabled=true
+glideEnabled=true
+scaleEnabled=true
+squashEnabled=false
+magiclampEnabled=false
+windowviewEnabled=true
+kwin4_effect_translucencyEnabled=true
+highlightwindowEnabled=true
+screenedgeEnabled=true
+overviewEnabled=true
+
+# ─── Windows 11 Tarzı Glide (Akıcı Pencere Açılış/Kapanış) ───
+[Effect-Glide]
+Duration=250
+GlideAngle=4
+GlideFactor=2
+
+# ─── Windows 11 Tarzı Scale (Simge Durumu Küçülme/Büyüme) ───
+[Effect-Scale]
+Duration=220
+
+# ─── Akrilik & Mica Bulanıklık (Dual-Kawase Blur) ───
+[Effect-Blur]
+BlurRadius=14
+NoiseStrength=3
+CacheTexture=true
+
+# ─── Yuvarlatılmış Köşeler & Başlık Çubuğu Düzeni ───
+[org.kde.kdecoration2]
+BorderSize=None
+BorderSizeAuto=false
+ButtonsOnLeft=
+ButtonsOnRight=IAX
+CloseOnDoubleClickOnMenu=false
+ShowToolTips=true
+
+# ─── Snap Assist & Pencere Hizalama ───
+[Windows]
+Snap=true
+SnapZone=10
+ElectricBorders=1
+ElectricBorderMaximize=true
+ElectricBorderTiling=true
+ElectricBorderCornerRatio=0.25
+BorderSnapZone=10
+WindowSnapZone=10
+CenterByShortcut=true
+TitlebarDoubleClickCommand=Maximize
+GeometryTip=false
+
+[EdgeBarrier]
+CornerBarrier=true
+EdgeBarrier=100
+
+[Tiling]
+padding=8
+
+[Wayland]
+InputMethod=/usr/share/applications/org.fcitx.Fcitx5.desktop
