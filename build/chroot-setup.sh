@@ -64,7 +64,6 @@ apt-get install -y --no-install-recommends \
     keyboard-configuration \
     initramfs-tools \
     casper \
-    lupin-casper \
     discover \
     laptop-detect \
     os-prober

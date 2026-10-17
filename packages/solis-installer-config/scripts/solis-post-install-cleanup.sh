@@ -27,7 +27,7 @@ rm -f /home/*/Desktop/install-solis.desktop /home/*/Desktop/calamares.desktop 2>
 rm -f /etc/skel/Desktop/install-solis.desktop /etc/skel/Desktop/calamares.desktop 2>/dev/null || true
 
 # 5. Kurulum araçlarını ve live-boot (casper) paketlerini hedef sistemden temizle
-apt-get purge -y calamares calamares-settings-ubuntu casper lupin-casper 2>/dev/null || true
+apt-get purge -y calamares calamares-settings-ubuntu casper 2>/dev/null || true
 apt-get autoremove -y --purge 2>/dev/null || true
 
 # 6. GRUB önyükleyicisini kurulu disk için güncelle (Windows 11 dual-boot algılansın)
