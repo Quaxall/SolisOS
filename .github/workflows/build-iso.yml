@@ -58,7 +58,7 @@ jobs:
         run: |
           chmod +x build/*.sh scripts/*.sh
           sudo mkdir -p /build/output
-          sudo ./build/build-solisos.sh
+          sudo PROJECT_DIR="$GITHUB_WORKSPACE" OUTPUT_DIR=/build/output ./build/build-solisos.sh
 
       - name: 📋 Çıktı Dosyalarını Doğrula
         run: |

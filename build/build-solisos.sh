@@ -32,11 +32,12 @@ SOLIS_ISO_NAME="solis-os-${SOLIS_VERSION}-${SOLIS_CODENAME}-${SOLIS_ARCH}.iso"
 SOLIS_ISO_LABEL="SOLIS_OS_${SOLIS_VERSION^^}"
 
 # ─── Çalışma Dizinleri ───
-BUILD_DIR="/tmp/solis-build"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="${PROJECT_DIR:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
+BUILD_DIR="${BUILD_DIR:-/tmp/solis-build}"
 ROOTFS_DIR="${BUILD_DIR}/rootfs"
 ISO_STAGING="${BUILD_DIR}/iso-staging"
-OUTPUT_DIR="/build/output"
-PROJECT_DIR="/build"
+OUTPUT_DIR="${OUTPUT_DIR:-/build/output}"
 
 # ─── Zamanlayıcı ───
 BUILD_START=$(date +%s)
@@ -422,7 +423,7 @@ if [ -f "$ISO_PATH" ]; then
     # SHA256 hash oluştur
     cd "$OUTPUT_DIR"
     sha256sum "${SOLIS_ISO_NAME}" > SHA256SUMS
-    cd /build
+    cd "${PROJECT_DIR}"
 
     ISO_SIZE=$(du -sh "$ISO_PATH" | cut -f1)
     ISO_SHA=$(sha256sum "$ISO_PATH" | cut -d' ' -f1)
