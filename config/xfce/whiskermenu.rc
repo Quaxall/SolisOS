@@ -1,0 +1,45 @@
+# ═══════════════════════════════════════════════════════════════════
+# ☀️ Solis OS — Whisker Menu (Windows 11 Start Menu Style)
+# ═══════════════════════════════════════════════════════════════════
+
+favorites=firefox.desktop,thunar.desktop,xfce4-terminal.desktop,mousepad.desktop,flameshot.desktop,gnome-calculator.desktop,calamares.desktop
+recent=
+custom-menu-file=
+
+# Düğme Görünümü
+button-title=
+button-icon=/usr/share/pixmaps/solis/solis-startmenu-icon.svg
+button-single-row=false
+show-button-title=false
+show-button-icon=true
+
+# Arayüz Düzeni (Win11 Tarzı)
+launcher-show-name=true
+launcher-show-description=false
+launcher-show-tooltip=true
+item-icon-size=3
+category-icon-size=2
+view-as-icons=true
+view-mode=1
+default-category=0
+recent-items-max=8
+favorites-in-recent=true
+
+# Konumlandırma (Arama üstte, güç butonları altta)
+position-search-alternate=true
+position-commands-alternate=true
+position-categories-alternate=false
+position-categories-horizontal=false
+stay-on-focus-out=false
+
+# Komutlar
+confirm-session-command=false
+menu-width=520
+menu-height=600
+menu-opacity=95
+command-settings=xfce4-settings-manager
+command-lockscreen=xflock4
+command-switchuser=dm-tool switch-to-greeter
+command-logout=xfce4-session-logout
+command-menueditor=menulibre
+command-profile=xfce4-settings-manager

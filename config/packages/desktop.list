@@ -28,6 +28,7 @@ xfce4-statusnotifier-plugin
 xfce4-pulseaudio-plugin
 xfce4-datetime-plugin
 xfce4-clipman-plugin
+network-manager-gnome
 
 # Ekran Yöneticisi (Login Screen)
 lightdm

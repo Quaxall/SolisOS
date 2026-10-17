@@ -300,21 +300,21 @@ set menu_color_normal=white/black
 set menu_color_highlight=black/light-gray
 
 # ─── Ana Menü ───
-menuentry "☀️ Solis OS — Live Oturum Başlat" {
+menuentry "☀️ Solis OS — Canlı Masaüstü Oturumu Başlat (Live)" {
     set gfxpayload=keep
-    linux /casper/vmlinuz boot=casper quiet splash --- 
+    linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash --- 
     initrd /casper/initrd
 }
 
-menuentry "☀️ Solis OS — Sistemi Kur" {
+menuentry "☀️ Solis OS — Güvenli Grafik Modu (nomodeset)" {
     set gfxpayload=keep
-    linux /casper/vmlinuz boot=casper only-ubiquity quiet splash ---
+    linux /casper/vmlinuz boot=casper username=solis hostname=solis nomodeset quiet splash ---
     initrd /casper/initrd
 }
 
-menuentry "☀️ Solis OS — Güvenli Mod (nomodeset)" {
+menuentry "🔧 Solis OS — Doğrudan Sistem Kurulumu (Calamares)" {
     set gfxpayload=keep
-    linux /casper/vmlinuz boot=casper nomodeset quiet splash ---
+    linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash solis-installer ---
     initrd /casper/initrd
 }
 

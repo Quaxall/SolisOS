@@ -176,23 +176,43 @@ cd /tmp
 
 # Fluent GTK Theme
 if [ -d "Fluent-gtk-theme" ]; then rm -rf Fluent-gtk-theme; fi
-git clone --depth=1 https://github.com/vinceliuice/Fluent-gtk-theme.git
-cd Fluent-gtk-theme
-./install.sh --tweaks round --dest /usr/share/themes
-cd /tmp
+if git clone --depth=1 https://github.com/vinceliuice/Fluent-gtk-theme.git; then
+    cd Fluent-gtk-theme
+    ./install.sh --tweaks round --dest /usr/share/themes 2>/dev/null || true
+    # Kvantum (Qt) Fluent Temasını da sisteme kur
+    if [ -d "src/other/kvantum" ]; then
+        mkdir -p /usr/share/Kvantum
+        cp -r src/other/kvantum/* /usr/share/Kvantum/ 2>/dev/null || true
+    fi
+    cd /tmp
+else
+    log_sub "⚠️ Fluent GTK teması indirilemedi, yedek tema kullanılacak."
+fi
 
 # Fluent Icon Theme
 log_sub "Fluent ikon teması kuruluyor..."
 if [ -d "Fluent-icon-theme" ]; then rm -rf Fluent-icon-theme; fi
-git clone --depth=1 https://github.com/vinceliuice/Fluent-icon-theme.git
-cd Fluent-icon-theme
-./install.sh --dest /usr/share/icons
-cd /tmp
+if git clone --depth=1 https://github.com/vinceliuice/Fluent-icon-theme.git; then
+    cd Fluent-icon-theme
+    ./install.sh --dest /usr/share/icons 2>/dev/null || true
+    cd /tmp
+else
+    log_sub "⚠️ Fluent ikon teması indirilemedi."
+fi
+
+# Fluent Cursor Theme (Windows 11 Tarzı İmleç)
+log_sub "Fluent imleç teması kuruluyor..."
+if [ -d "Fluent-cursors" ]; then rm -rf Fluent-cursors; fi
+if git clone --depth=1 https://github.com/vinceliuice/Fluent-cursors.git 2>/dev/null; then
+    cd Fluent-cursors
+    ./install.sh --dest /usr/share/icons 2>/dev/null || true
+    cd /tmp
+fi
 
 # Temizle
-rm -rf /tmp/Fluent-gtk-theme /tmp/Fluent-icon-theme
+rm -rf /tmp/Fluent-gtk-theme /tmp/Fluent-icon-theme /tmp/Fluent-cursors
 
-log_sub "Fluent tema ve ikonlar kuruldu."
+log_sub "Fluent GTK, Kvantum, ikon ve imleç temaları kuruldu."
 
 # ═══════════════════════════════════════════════════════════════════
 # 7. Solis OS Branding Enjeksiyonu
@@ -291,116 +311,163 @@ if [ -f "${CONFIG_DIR}/system/disabled-services.list" ]; then
 fi
 
 # ═══════════════════════════════════════════════════════════════════
-# 9. picom ve XFCE Panel Yapılandırması (Win11 Görünümü)
+# 9. picom, XFCE Panel (Windows 11 Ortalanmış) ve Fluent Tema
 # ═══════════════════════════════════════════════════════════════════
 
-log_sub "picom ve Win11 panel yapılandırması uygulanıyor..."
+log_sub "Windows 11 Fluent masaüstü ve ortalanmış görev çubuğu yapılandırılıyor..."
 
-# /etc/skel — Varsayılan kullanıcı yapılandırması
+# /etc/skel — Varsayılan kullanıcı şablonu
 SKEL="/etc/skel"
+XDG_XFCE="/etc/xdg/xfce4"
 
-# picom yapılandırması
 mkdir -p "${SKEL}/.config/picom"
-cp "${CONFIG_DIR}/picom/picom.conf" "${SKEL}/.config/picom/picom.conf"
-
-# GTK CSS (floating panel)
 mkdir -p "${SKEL}/.config/gtk-3.0"
-cp "${CONFIG_DIR}/user/skel/.config/gtk-3.0/gtk.css" "${SKEL}/.config/gtk-3.0/gtk.css"
-
-# picom autostart (oturum açılışında otomatik başlat)
 mkdir -p "${SKEL}/.config/autostart"
+mkdir -p "${SKEL}/.config/xfce4/xfconf/xfce-perchannel-xml"
+mkdir -p "${SKEL}/.config/xfce4/panel"
+mkdir -p "${SKEL}/.config/Kvantum"
+mkdir -p "${XDG_XFCE}/xfconf/xfce-perchannel-xml"
+mkdir -p "${XDG_XFCE}/panel"
+
+# ─── 1. picom Yapılandırması (Acrylic / Mica Bulanıklık & Yuvarlatılmış Köşeler) ───
+if [ -f "${CONFIG_DIR}/picom/picom.conf" ]; then
+    cp "${CONFIG_DIR}/picom/picom.conf" "${SKEL}/.config/picom/picom.conf"
+    mkdir -p /etc/xdg/picom
+    cp "${CONFIG_DIR}/picom/picom.conf" /etc/xdg/picom/picom.conf
+fi
+
+# ─── 2. GTK3 CSS (Windows 11 Floating Taskbar & Yuvarlatılmış Köşeler) ───
+if [ -f "${CONFIG_DIR}/user/skel/.config/gtk-3.0/gtk.css" ]; then
+    cp "${CONFIG_DIR}/user/skel/.config/gtk-3.0/gtk.css" "${SKEL}/.config/gtk-3.0/gtk.css"
+fi
+
+# ─── 3. Ortalanmış Windows 11 Görev Çubuğu (XFCE Panel) ───
+if [ -f "${CONFIG_DIR}/xfce/xfce4-panel.xml" ]; then
+    cp "${CONFIG_DIR}/xfce/xfce4-panel.xml" "${SKEL}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"
+    cp "${CONFIG_DIR}/xfce/xfce4-panel.xml" "${XDG_XFCE}/xfconf/xfce-perchannel-xml/xfce4-panel.xml"
+fi
+
+# ─── 4. Whisker Menu (Windows 11 Başlat Menüsü Düzeni) ───
+if [ -f "${CONFIG_DIR}/xfce/whiskermenu.rc" ]; then
+    cp "${CONFIG_DIR}/xfce/whiskermenu.rc" "${SKEL}/.config/xfce4/panel/whiskermenu-2.rc"
+    cp "${CONFIG_DIR}/xfce/whiskermenu.rc" "${SKEL}/.config/xfce4/panel/whiskermenu-1.rc"
+    cp "${CONFIG_DIR}/xfce/whiskermenu.rc" "${XDG_XFCE}/panel/whiskermenu-2.rc"
+fi
+
+# ─── 5. Docklike Plugin (Win11 Ortalanmış Sabitlenmiş Uygulamalar) ───
+if [ -f "${CONFIG_DIR}/xfce/docklike.rc" ]; then
+    cp "${CONFIG_DIR}/xfce/docklike.rc" "${SKEL}/.config/xfce4/panel/docklike-3.rc"
+    cp "${CONFIG_DIR}/xfce/docklike.rc" "${SKEL}/.config/xfce4/panel/docklike-1.rc"
+    cp "${CONFIG_DIR}/xfce/docklike.rc" "${XDG_XFCE}/panel/docklike-3.rc"
+fi
+
+# ─── 6. XFCE Tema & Pencere Ayarları ───
+if [ -f "${CONFIG_DIR}/xfce/xsettings.xml" ]; then
+    cp "${CONFIG_DIR}/xfce/xsettings.xml" "${SKEL}/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"
+    cp "${CONFIG_DIR}/xfce/xsettings.xml" "${XDG_XFCE}/xfconf/xfce-perchannel-xml/xsettings.xml"
+fi
+
+if [ -f "${CONFIG_DIR}/xfce/xfwm4.xml" ]; then
+    cp "${CONFIG_DIR}/xfce/xfwm4.xml" "${SKEL}/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"
+    cp "${CONFIG_DIR}/xfce/xfwm4.xml" "${XDG_XFCE}/xfconf/xfce-perchannel-xml/xfwm4.xml"
+fi
+
+if [ -f "${CONFIG_DIR}/xfce/xfce4-desktop.xml" ]; then
+    cp "${CONFIG_DIR}/xfce/xfce4-desktop.xml" "${SKEL}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
+    cp "${CONFIG_DIR}/xfce/xfce4-desktop.xml" "${XDG_XFCE}/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
+fi
+
+# ─── 7. Varsayılan Yardımcı Uygulamalar ───
+cat > "${SKEL}/.config/xfce4/helpers.rc" << 'EOF'
+WebBrowser=firefox
+TerminalEmulator=xfce4-terminal
+FileManager=thunar
+EOF
+
+# ─── 8. Kvantum / Qt Fluent Tema Yapılandırması ───
+cat > "${SKEL}/.config/Kvantum/kvantum.kvconfig" << 'EOF'
+[General]
+theme=KvFluent
+EOF
+
+# Sistem geneli Qt çevre değişkenleri
+cat >> /etc/environment << 'EOF'
+QT_STYLE_OVERRIDE=kvantum
+QT_QPA_PLATFORMTHEME=qt5ct
+EOF
+
+# ─── 9. Oturum Açılışında Otomatik Başlatılacaklar (Autostart) ───
+# picom Compositor
 cat > "${SKEL}/.config/autostart/picom.desktop" << 'EOF'
 [Desktop Entry]
 Type=Application
 Name=Picom Compositor
 Comment=Solis OS Fluent Design compositor
-Exec=picom -b --config ~/.config/picom/picom.conf
+Exec=picom -b --config /etc/skel/.config/picom/picom.conf
 Hidden=false
 NoDisplay=true
 X-GNOME-Autostart-enabled=true
 EOF
 
-# XFCE varsayılan tema ayarları
-mkdir -p "${SKEL}/.config/xfce4/xfconf/xfce-perchannel-xml"
-
-# xsettings — GTK tema, ikon, font
-cat > "${SKEL}/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml" << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<channel name="xsettings" version="1.0">
-  <property name="Net" type="empty">
-    <property name="ThemeName" type="string" value="Fluent-round-Dark"/>
-    <property name="IconThemeName" type="string" value="Fluent-dark"/>
-    <property name="CursorThemeName" type="string" value="Adwaita"/>
-    <property name="CursorSize" type="int" value="24"/>
-    <property name="EnableEventSounds" type="bool" value="false"/>
-    <property name="EnableInputFeedbackSounds" type="bool" value="false"/>
-    <property name="SoundThemeName" type="string" value="freedesktop"/>
-  </property>
-  <property name="Gtk" type="empty">
-    <property name="FontName" type="string" value="Inter 10"/>
-    <property name="MonospaceFontName" type="string" value="Cascadia Code 10"/>
-    <property name="CursorThemeName" type="string" value="Adwaita"/>
-    <property name="CursorThemeSize" type="int" value="24"/>
-    <property name="ButtonImages" type="bool" value="true"/>
-    <property name="MenuImages" type="bool" value="true"/>
-  </property>
-  <property name="Xft" type="empty">
-    <property name="Antialias" type="int" value="1"/>
-    <property name="HintStyle" type="string" value="hintslight"/>
-    <property name="Hinting" type="int" value="1"/>
-    <property name="RGBA" type="string" value="rgb"/>
-    <property name="DPI" type="int" value="-1"/>
-  </property>
-</channel>
+# Ağ Yöneticisi Tepsisi (nm-applet)
+cat > "${SKEL}/.config/autostart/nm-applet.desktop" << 'EOF'
+[Desktop Entry]
+Type=Application
+Name=Network Manager Applet
+Comment=Solis OS Network Status Indicator
+Exec=nm-applet
+Icon=nm-device-wireless
+Terminal=false
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
 EOF
 
-# xfwm4 — Pencere yöneticisi tema
-cat > "${SKEL}/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml" << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<channel name="xfwm4" version="1.0">
-  <property name="general" type="empty">
-    <property name="theme" type="string" value="Fluent-round-Dark"/>
-    <property name="title_font" type="string" value="Inter Bold 10"/>
-    <property name="use_compositing" type="bool" value="false"/>
-    <property name="placement_ratio" type="int" value="50"/>
-    <property name="cycle_minimum" type="bool" value="true"/>
-    <property name="easy_click" type="string" value="Super"/>
-    <property name="shadow_opacity" type="int" value="50"/>
-    <property name="title_alignment" type="string" value="center"/>
-  </property>
-</channel>
+# Pano Yöneticisi (Clipman)
+cat > "${SKEL}/.config/autostart/xfce4-clipman.desktop" << 'EOF'
+[Desktop Entry]
+Type=Application
+Name=Clipman
+Comment=Solis OS Clipboard Manager
+Exec=xfce4-clipman
+Icon=xfce4-clipman-plugin
+Terminal=false
+Hidden=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
 EOF
 
-# xfce4-desktop — Duvar kağıdı
-cat > "${SKEL}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml" << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<channel name="xfce4-desktop" version="1.0">
-  <property name="backdrop" type="empty">
-    <property name="screen0" type="empty">
-      <property name="monitorVirtual-1" type="empty">
-        <property name="workspace0" type="empty">
-          <property name="color-style" type="int" value="0"/>
-          <property name="image-style" type="int" value="5"/>
-          <property name="last-image" type="string" value="/usr/share/backgrounds/solis/solis-default.jpg"/>
-        </property>
-      </property>
-    </property>
-  </property>
-  <property name="desktop-icons" type="empty">
-    <property name="style" type="int" value="0"/>
-  </property>
-</channel>
-EOF
+# ─── 10. Solis Tema Değiştirici Aracı (Dark / Light Switcher) ───
+cat > /usr/local/bin/solis-theme << 'EOF'
+#!/bin/bash
+# Solis OS Dinamik Koyu / Açık Mod Değiştirici
+MODE="${1:-dark}"
 
-log_sub "Win11 panel ve tema yapılandırması tamamlandı."
+if [ "$MODE" = "light" ]; then
+    xfconf-query -c xsettings -p /Net/ThemeName -s "Fluent-round-Light" 2>/dev/null || true
+    xfconf-query -c xsettings -p /Net/IconThemeName -s "Fluent" 2>/dev/null || true
+    xfconf-query -c xfwm4 -p /general/theme -s "Fluent-round-Light" 2>/dev/null || true
+    echo "☀️ Solis OS Açık Moda Geçildi."
+else
+    xfconf-query -c xsettings -p /Net/ThemeName -s "Fluent-round-Dark" 2>/dev/null || true
+    xfconf-query -c xsettings -p /Net/IconThemeName -s "Fluent-dark" 2>/dev/null || true
+    xfconf-query -c xfwm4 -p /general/theme -s "Fluent-round-Dark" 2>/dev/null || true
+    echo "🌙 Solis OS Koyu Moda Geçildi."
+fi
+EOF
+chmod +x /usr/local/bin/solis-theme
+
+log_sub "Windows 11 panel, Whisker menü ve tema yapılandırması tamamlandı."
 
 # ═══════════════════════════════════════════════════════════════════
-# 10. LightDM (Login Ekranı) Yapılandırması
+# 10. LightDM ve Otomatik Giriş (Autologin) Yapılandırması
 # ═══════════════════════════════════════════════════════════════════
 
-log_sub "LightDM yapılandırılıyor..."
+log_sub "LightDM ve otomatik giriş (Live Desktop) yapılandırılıyor..."
 
-mkdir -p /etc/lightdm
+mkdir -p /etc/lightdm/lightdm.conf.d
+
+# LightDM GTK Greeter yapılandırması
 cat > /etc/lightdm/lightdm-gtk-greeter.conf << 'EOF'
 [greeter]
 theme-name = Fluent-round-Dark
@@ -417,29 +484,73 @@ position = 50%,center 50%,center
 panel-position = bottom
 EOF
 
-# Autologin ayarı — Live oturum için
+# Canlı oturum otomatik giriş ayarı (Hem Seat:* hem SeatDefaults desteklenir)
 cat > /etc/lightdm/lightdm.conf << 'EOF'
+[Seat:*]
+autologin-guest = false
+autologin-user = solis
+autologin-user-timeout = 0
+autologin-session = xfce
+user-session = xfce
+greeter-session = lightdm-gtk-greeter
+
 [SeatDefaults]
 autologin-guest = false
 autologin-user = solis
 autologin-user-timeout = 0
+autologin-session = xfce
 user-session = xfce
 greeter-session = lightdm-gtk-greeter
 EOF
 
+# PAM autologin yapılandırması (şifresiz masaüstüne düşüş için zorunlu)
+cat > /etc/pam.d/lightdm-autologin << 'EOF'
+#%PAM-1.0
+auth      requisite pam_nologin.so
+auth      required  pam_permit.so
+@include common-account
+session [success=ok ignore=ignore default=bad] pam_selinux.so close
+session   required  pam_limits.so
+@include common-session
+session [success=ok ignore=ignore default=bad] pam_selinux.so open
+session   optional  pam_keyinit.so force revoke
+@include common-password
+EOF
+
+# Grafik hedefini varsayılan yap ve LightDM'i etkinleştir
+systemctl set-default graphical.target 2>/dev/null || true
+systemctl enable lightdm 2>/dev/null || true
+
 # ═══════════════════════════════════════════════════════════════════
-# 11. Live Oturum Kullanıcısı Oluştur
+# 11. Canlı Oturum Kullanıcısı (solis) Oluşturma ve Hazırlama
 # ═══════════════════════════════════════════════════════════════════
 
-log_sub "Live oturum kullanıcısı oluşturuluyor..."
+log_sub "Canlı oturum kullanıcısı (solis) yapılandırılıyor..."
 
-# solis kullanıcısını oluştur (parola olmadan, sudo yetkili)
-useradd -m -s /bin/bash -G sudo,audio,video,plugdev,netdev,bluetooth,lpadmin solis 2>/dev/null || true
+# Autologin gruplarını oluştur
+groupadd -r autologin 2>/dev/null || true
+groupadd -r nopasswdlogin 2>/dev/null || true
+
+# solis kullanıcısını oluştur
+useradd -m -s /bin/bash -G sudo,audio,video,plugdev,netdev,bluetooth,lpadmin,autologin,nopasswdlogin solis 2>/dev/null || true
+usermod -a -G autologin,nopasswdlogin,sudo solis 2>/dev/null || true
+
+# Şifresiz sudo yetkisi
 echo "solis ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/solis
 chmod 440 /etc/sudoers.d/solis
 
-# Parolasız giriş (Live oturum için)
+# Şifresiz giriş
 passwd -d solis 2>/dev/null || true
+
+# Doğrudan XFCE oturumuna başlama dosyası (.xsession)
+echo "exec startxfce4" > /home/solis/.xsession
+chmod +x /home/solis/.xsession
+
+# /etc/skel şablonunu kullanıcının ev dizinine kopyala ve izinleri ata
+cp -r "${SKEL}/." /home/solis/
+chown -R solis:solis /home/solis/
+
+log_sub "Canlı oturum ve otomatik masaüstü girişi başarıyla hazırlandı."
 
 # ═══════════════════════════════════════════════════════════════════
 # 12. Flatpak Depoları

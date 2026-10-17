@@ -1,0 +1,12 @@
+# ═══════════════════════════════════════════════════════════════════
+# ☀️ Solis OS — Docklike Plugin (Windows 11 Centered Taskbar Icons)
+# ═══════════════════════════════════════════════════════════════════
+
+[General]
+pinned = /usr/share/applications/thunar.desktop;/usr/share/applications/firefox.desktop;/usr/share/applications/xfce4-terminal.desktop;/usr/share/applications/mousepad.desktop;/usr/share/applications/calamares.desktop;
+indicatorColor = #FFB300
+indicatorStyle = 0
+showDock = true
+forceIconSize = 26
+showLabels = false
+keyCombo = Super

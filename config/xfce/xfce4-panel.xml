@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ═══════════════════════════════════════════════════════════════════
+  ☀️ Solis OS — Windows 11 Centered Taskbar Layout
+  Ortalanmış Görev Çubuğu Yapılandırması (XFCE 4.18)
+  ═══════════════════════════════════════════════════════════════════
+-->
+<channel name="xfce4-panel" version="1.0">
+  <property name="configver" type="int" value="2"/>
+  <property name="panels" type="array">
+    <value type="int" value="1"/>
+  </property>
+  
+  <property name="panel-1" type="empty">
+    <!-- Konum: Ekranın alt kısmı, kilitli -->
+    <property name="position" type="string" value="p=10;x=0;y=0"/>
+    <property name="length" type="uint" value="100"/>
+    <property name="position-locked" type="bool" value="true"/>
+    <property name="size" type="uint" value="44"/>
+    <property name="icon-size" type="uint" value="24"/>
+    <property name="nrows" type="uint" value="1"/>
+    <property name="mode" type="uint" value="0"/>
+    <property name="autohide-behavior" type="uint" value="0"/>
+    
+    <!-- Eklenti Sıralaması (Ortalanmış Win11 Düzeni) -->
+    <property name="plugin-ids" type="array">
+      <value type="int" value="1"/> <!-- Sol Dengeleyici Ayırıcı (Expand) -->
+      <value type="int" value="2"/> <!-- ☀️ Win11 Başlat Menüsü (Whisker Menu) -->
+      <value type="int" value="3"/> <!-- 🗂️ Ortalanmış Uygulama Simgeleri (Docklike) -->
+      <value type="int" value="4"/> <!-- Sağ Dengeleyici Ayırıcı (Expand) -->
+      <value type="int" value="5"/> <!-- Sistem Bildirim Alanı (Status Notifier) -->
+      <value type="int" value="6"/> <!-- Sistem Tepsisi (Systray) -->
+      <value type="int" value="7"/> <!-- Ses Denetimi (PulseAudio) -->
+      <value type="int" value="8"/> <!-- Saat & Takvim (Win11 2-Satır Format) -->
+      <value type="int" value="9"/> <!-- Masaüstünü Göster (Sağ Kenar Çubuğu) -->
+    </property>
+    
+    <property name="background-style" type="uint" value="0"/>
+    <property name="leave-opacity" type="uint" value="100"/>
+    <property name="enter-opacity" type="uint" value="100"/>
+  </property>
+  
+  <property name="plugins" type="empty">
+    <!-- 1. Sol Dengeleyici Ayırıcı -->
+    <property name="plugin-1" type="string" value="separator">
+      <property name="style" type="uint" value="0"/>
+      <property name="expand" type="bool" value="true"/>
+    </property>
+    
+    <!-- 2. Solis OS Başlat Menüsü -->
+    <property name="plugin-2" type="string" value="whiskermenu"/>
+    
+    <!-- 3. Win11 Docklike Görev Çubuğu (Birleşik Simgeler) -->
+    <property name="plugin-3" type="string" value="docklike"/>
+    
+    <!-- 4. Sağ Dengeleyici Ayırıcı -->
+    <property name="plugin-4" type="string" value="separator">
+      <property name="style" type="uint" value="0"/>
+      <property name="expand" type="bool" value="true"/>
+    </property>
+    
+    <!-- 5. Status Notifier (Modern Sistem Bildirimleri) -->
+    <property name="plugin-5" type="string" value="statusnotifier">
+      <property name="single-row" type="bool" value="true"/>
+      <property name="square-icons" type="bool" value="true"/>
+      <property name="menu-is-primary" type="bool" value="false"/>
+    </property>
+    
+    <!-- 6. Geleneksel Sistem Tepsisi (Ağ, vs.) -->
+    <property name="plugin-6" type="string" value="systray">
+      <property name="square-icons" type="bool" value="true"/>
+      <property name="single-row" type="bool" value="true"/>
+      <property name="size-max" type="uint" value="22"/>
+    </property>
+    
+    <!-- 7. Ses Denetimi -->
+    <property name="plugin-7" type="string" value="pulseaudio">
+      <property name="enable-keyboard-shortcuts" type="bool" value="true"/>
+      <property name="show-notifications" type="bool" value="true"/>
+    </property>
+    
+    <!-- 8. Win11 Tarzı Saat & Tarih -->
+    <property name="plugin-8" type="string" value="clock">
+      <property name="digital-layout" type="uint" value="3"/>
+      <property name="digital-time-format" type="string" value="%H:%M%n%d.%m.%Y"/>
+      <property name="digital-time-font" type="string" value="Inter Medium 9"/>
+      <property name="mode" type="uint" value="2"/>
+    </property>
+    
+    <!-- 9. Masaüstünü Göster (Win11 Sağ Kenar Şeridi) -->
+    <property name="plugin-9" type="string" value="showdesktop"/>
+  </property>
+</channel>
