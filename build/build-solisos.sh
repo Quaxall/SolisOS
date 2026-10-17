@@ -229,8 +229,19 @@ fi
 cp "$KERNEL_FILE" "${ISO_STAGING}/casper/vmlinuz"
 cp "$INITRD_FILE" "${ISO_STAGING}/casper/initrd"
 
-log_info "Kernel: $(basename "$KERNEL_FILE")"
-log_info "Initrd: $(basename "$INITRD_FILE")"
+# Eşleşme ve boyut doğrulaması (Sıfır Hata / Casper Canlı Boot)
+SRC_KERNEL_SZ=$(stat -c%s "$KERNEL_FILE" 2>/dev/null || stat -f%z "$KERNEL_FILE")
+DST_KERNEL_SZ=$(stat -c%s "${ISO_STAGING}/casper/vmlinuz" 2>/dev/null || stat -f%z "${ISO_STAGING}/casper/vmlinuz")
+SRC_INITRD_SZ=$(stat -c%s "$INITRD_FILE" 2>/dev/null || stat -f%z "$INITRD_FILE")
+DST_INITRD_SZ=$(stat -c%s "${ISO_STAGING}/casper/initrd" 2>/dev/null || stat -f%z "${ISO_STAGING}/casper/initrd")
+
+if [ "$SRC_KERNEL_SZ" != "$DST_KERNEL_SZ" ] || [ "$SRC_INITRD_SZ" != "$DST_INITRD_SZ" ]; then
+    log_error "Kernel veya Initrd kopyalama boyutu eşleşmiyor!"
+    exit 1
+fi
+
+log_info "Kernel: $(basename "$KERNEL_FILE") (${SRC_KERNEL_SZ} bytes) -> casper/vmlinuz [DOĞRULANDI]"
+log_info "Initrd: $(basename "$INITRD_FILE") (${SRC_INITRD_SZ} bytes) -> casper/initrd [DOĞRULANDI]"
 
 # SquashFS oluştur
 log_info "filesystem.squashfs oluşturuluyor... (Bu adım 5-15 dakika sürebilir)"
@@ -303,19 +314,19 @@ set menu_color_highlight=black/light-gray
 # ─── Ana Menü ───
 menuentry "☀️ Solis OS — Canlı Masaüstü Oturumu Başlat (Live)" {
     set gfxpayload=keep
-    linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash --- 
+    linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash vt.global_cursor_default=0 loglevel=3 rd.udev.log_priority=3 systemd.show_status=auto --- 
     initrd /casper/initrd
 }
 
 menuentry "☀️ Solis OS — Güvenli Grafik Modu (nomodeset)" {
     set gfxpayload=keep
-    linux /casper/vmlinuz boot=casper username=solis hostname=solis nomodeset quiet splash ---
+    linux /casper/vmlinuz boot=casper username=solis hostname=solis nomodeset quiet splash vt.global_cursor_default=0 loglevel=3 ---
     initrd /casper/initrd
 }
 
 menuentry "🔧 Solis OS — Doğrudan Sistem Kurulumu (Calamares)" {
     set gfxpayload=keep
-    linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash solis-installer ---
+    linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash vt.global_cursor_default=0 loglevel=3 rd.udev.log_priority=3 systemd.show_status=auto solis-installer ---
     initrd /casper/initrd
 }
 

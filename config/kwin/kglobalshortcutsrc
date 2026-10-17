@@ -1,0 +1,25 @@
+# ═══════════════════════════════════════════════════════════════════
+# ☀️ Solis OS — Windows 11 Global Shortcuts (KDE Plasma / Wayland)
+# ═══════════════════════════════════════════════════════════════════
+
+[org.kde.spectacle.desktop]
+RectangularRegionScreenShot=Meta+Shift+S,none,Bölgesel Ekran Görüntüsü
+_launch=Print,none,Ekran Görüntüsü
+
+[org.kde.plasma-systemmonitor.desktop]
+_launch=Ctrl+Shift+Esc,none,Sistem Görev Yöneticisi
+
+[org.kde.dolphin.desktop]
+_launch=Meta+E,none,Dosya Yöneticisi
+
+[kwin]
+LockSession=Meta+L,none,Ekranı Kilitle
+ShowDesktop=Meta+D,none,Masaüstünü Göster
+Window Quick Tile Left=Meta+Left,none,Sola Yasla
+Window Quick Tile Right=Meta+Right,none,Sağa Yasla
+Window Maximize=Meta+Up,none,Pencereyi Büyüt
+Window Minimize=Meta+Down,none,Pencereyi Küçült
+Walk Through Windows=Alt+Tab,none,Pencereler Arasında Geçiş
+
+[org.kde.klipper.desktop]
+clipboard_action=Meta+V,none,Pano Geçmişi

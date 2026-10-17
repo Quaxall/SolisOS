@@ -69,12 +69,21 @@ apt-get install -y --no-install-recommends \
     laptop-detect \
     os-prober
 
-# Locale yapılandırması
-log_sub "Locale yapılandırılıyor..."
+# Locale ve Klavye yapılandırması (Türkçe ve İngilizce)
+log_sub "Locale ve Klavye yapılandırılıyor (tr_TR.UTF-8 + en_US.UTF-8)..."
 sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 sed -i 's/# tr_TR.UTF-8 UTF-8/tr_TR.UTF-8 UTF-8/' /etc/locale.gen
-locale-gen
-update-locale LANG=en_US.UTF-8
+locale-gen tr_TR.UTF-8 en_US.UTF-8
+update-locale LANG=tr_TR.UTF-8 LC_MESSAGES=POSIX
+
+# Klavye ayarı: Varsayılan Türkçe Q, ikincil İngilizce (US), Alt+Shift ile geçiş
+cat > /etc/default/keyboard << 'EOF'
+XKBMODEL="pc105"
+XKBLAYOUT="tr,us"
+XKBVARIANT=""
+XKBOPTIONS="grp:alt_shift_toggle,terminate:ctrl_alt_bksp"
+BACKSPACE="guess"
+EOF
 
 # ═══════════════════════════════════════════════════════════════════
 # 3. Çekirdek (Kernel) Kurulumu
@@ -378,6 +387,13 @@ if [ -f "${CONFIG_DIR}/xfce/xfce4-desktop.xml" ]; then
     cp "${CONFIG_DIR}/xfce/xfce4-desktop.xml" "${XDG_XFCE}/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
 fi
 
+# ─── 6b. Windows 11 Kas Hafızası Kısayolları (XFCE) ───
+if [ -f "${CONFIG_DIR}/xfce/xfce4-keyboard-shortcuts.xml" ]; then
+    cp "${CONFIG_DIR}/xfce/xfce4-keyboard-shortcuts.xml" "${SKEL}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml"
+    cp "${CONFIG_DIR}/xfce/xfce4-keyboard-shortcuts.xml" "${XDG_XFCE}/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml"
+    log_sub "  ✅ Windows 11 kısayolları (Meta+Shift+S, Ctrl+Shift+Esc, Meta+E, Meta+V) XFCE'ye işlendi."
+fi
+
 # ─── 7. Varsayılan Yardımcı Uygulamalar ───
 cat > "${SKEL}/.config/xfce4/helpers.rc" << 'EOF'
 WebBrowser=firefox
@@ -385,17 +401,29 @@ TerminalEmulator=xfce4-terminal
 FileManager=thunar
 EOF
 
-# ─── 8. Kvantum / Qt Fluent Tema Yapılandırması ───
+# ─── 8. Kvantum / Qt Fluent Tema ve İmleç Bütünlüğü ───
 cat > "${SKEL}/.config/Kvantum/kvantum.kvconfig" << 'EOF'
 [General]
 theme=KvFluent
 EOF
 
-# Sistem geneli Qt çevre değişkenleri
+# Sistem geneli Qt ve İmleç çevre değişkenleri (Wayland, Qt, GTK4 ve XWayland uyumu)
 cat >> /etc/environment << 'EOF'
 QT_STYLE_OVERRIDE=kvantum
 QT_QPA_PLATFORMTHEME=qt5ct
+XCURSOR_THEME=Fluent-dark
+XCURSOR_SIZE=24
 EOF
+
+# Varsayılan imleç mirası (Fallback index.theme)
+mkdir -p /usr/share/icons/default "${SKEL}/.icons/default"
+cat > /usr/share/icons/default/index.theme << 'EOF'
+[Icon Theme]
+Name=Default
+Comment=Default Cursor Theme
+Inherits=Fluent-dark,Fluent-cursors,Fluent-dark-cursors,Adwaita
+EOF
+cp /usr/share/icons/default/index.theme "${SKEL}/.icons/default/index.theme"
 
 # ─── 9. Oturum Açılışında Otomatik Başlatılacaklar (Autostart) ───
 # picom Compositor
@@ -551,6 +579,8 @@ groupadd -r nopasswdlogin 2>/dev/null || true
 useradd -m -s /bin/bash -G sudo,audio,video,plugdev,netdev,bluetooth,lpadmin,autologin,nopasswdlogin solis 2>/dev/null || true
 usermod -a -G autologin,nopasswdlogin,sudo solis 2>/dev/null || true
 
+echo "solis ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/solis-live
+chmod 440 /etc/sudoers.d/solis-live
 echo "solis ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/solis
 chmod 440 /etc/sudoers.d/solis
 passwd -d solis 2>/dev/null || true
@@ -676,6 +706,22 @@ if [ -d "${PACKAGES_DIR}/solis-installer-config/branding/solis" ]; then
     log_sub "  ✅ Calamares Solis OS Fluent teması entegre edildi."
 fi
 
+# Calamares Yapılandırması ve Kurulum Sonrası Canlı Oturum Temizlik Betiği
+if [ -f "${PACKAGES_DIR}/solis-installer-config/scripts/solis-post-install-cleanup.sh" ]; then
+    cp "${PACKAGES_DIR}/solis-installer-config/scripts/solis-post-install-cleanup.sh" /usr/local/bin/
+    chmod +x /usr/local/bin/solis-post-install-cleanup.sh
+    log_sub "  ✅ Kurulum sonrası temizlik betiği /usr/local/bin/solis-post-install-cleanup.sh kuruldu."
+fi
+
+mkdir -p /etc/calamares/modules
+if [ -f "${PACKAGES_DIR}/solis-installer-config/settings.conf" ]; then
+    cp "${PACKAGES_DIR}/solis-installer-config/settings.conf" /etc/calamares/
+fi
+if [ -f "${PACKAGES_DIR}/solis-installer-config/modules/shellprocess.conf" ]; then
+    cp "${PACKAGES_DIR}/solis-installer-config/modules/shellprocess.conf" /etc/calamares/modules/
+    log_sub "  ✅ Calamares shellprocess ve settings yapılandırması entegre edildi."
+fi
+
 # ─── Fastfetch & Terminal Solis Karşılama ───
 mkdir -p "${SKEL}/.config/fastfetch"
 if [ -f "${CONFIG_DIR}/user/skel/.config/fastfetch/config.jsonc" ]; then
@@ -693,12 +739,21 @@ fi
 EOF
 fi
 
-# ─── Donanım ve Çekirdek Servislerini Etkinleştir ───
-log_sub "Donanım, güç, ses ve ağ servisleri etkinleştiriliyor..."
+# ─── Donanım, Çekirdek ve Sanal Makine (VM) Servislerini Etkinleştir ───
+log_sub "Donanım, güç, ses, ağ ve sanal makine (VM) servisleri etkinleştiriliyor..."
 systemctl enable NetworkManager 2>/dev/null || true
 systemctl enable bluetooth 2>/dev/null || true
 systemctl enable power-profiles-daemon 2>/dev/null || true
 systemctl enable cups 2>/dev/null || true
+
+# Sanal Makine (QEMU / KVM / VirtualBox / VMware) Tam Ekran ve Çift Yönlü Pano Desteği
+systemctl enable qemu-guest-agent 2>/dev/null || true
+systemctl enable spice-vdagentd 2>/dev/null || true
+systemctl enable open-vm-tools 2>/dev/null || true
+systemctl enable vmtoolsd 2>/dev/null || true
+if [ -f /etc/xdg/autostart/spice-vdagent.desktop ]; then
+    cp /etc/xdg/autostart/spice-vdagent.desktop "${SKEL}/.config/autostart/" 2>/dev/null || true
+fi
 
 # /etc/skel şablonunu kullanıcının ev dizinine kopyala ve izinleri ata
 mkdir -p /home/solis/Desktop
@@ -769,7 +824,96 @@ log_sub "NetworkManager yapılandırılıyor..."
 systemctl enable NetworkManager 2>/dev/null || true
 
 # ═══════════════════════════════════════════════════════════════════
-# 16. Temizlik
+# 16. Donma Karşıtı Bellek Mimarisi (ZRAM + EarlyOOM)
+# ═══════════════════════════════════════════════════════════════════
+
+log_sub "Donma karşıtı bellek mimarisi (ZRAM + EarlyOOM) yapılandırılıyor..."
+
+# 1. systemd-zram-generator yapılandırması (RAM'in %50'si, zstd sıkıştırma)
+mkdir -p /etc/systemd
+cat > /etc/systemd/zram-generator.conf << 'EOF'
+# ☀️ Solis OS — ZRAM Ultra Hızlı Takas Alanı
+[zram0]
+zram-size = min(ram / 2, 8192)
+compression-algorithm = zstd
+options = discard
+EOF
+
+# 2. zram-tools alternatif yapılandırması
+if [ -d /etc/default ]; then
+    cat > /etc/default/zramswap << 'EOF'
+# ☀️ Solis OS — ZRAM Swap Yapılandırması
+ALGO=zstd
+PERCENT=50
+PRIORITY=100
+EOF
+fi
+
+# 3. Kernel bellek yönetimi (sysctl) — vm.swappiness=150, vm.page-cluster=0
+mkdir -p /etc/sysctl.d
+cat > /etc/sysctl.d/99-solis-memory.conf << 'EOF'
+# ☀️ Solis OS — Donma Karşıtı ZRAM Optimize Sysctl Parametreleri
+# ZRAM takas alanının erken ve aktif kullanılmasını sağlar
+vm.swappiness = 150
+# Sayfa kümeleme kapalı: ZRAM üzerinde tek tek sayfa okuma çok daha düşük gecikmelidir
+vm.page-cluster = 0
+# Bellek sıkışıklığında önbellek temizleme agresifliği
+vm.vfs_cache_pressure = 50
+EOF
+
+# 4. EarlyOOM yapılandırması — Sistem kilitlenmesini önler, masaüstü yöneticilerini korur
+cat > /etc/default/earlyoom << 'EOF'
+# ☀️ Solis OS — EarlyOOM Yapılandırması
+# RAM ve Swap %95 dolduğunda (kalan <%5) aşırı bellek tüketen süreçleri sonlandırır.
+# Masaüstü ortamı (kwin, wayland, sddm, lightdm, pipewire) KESİNLİKLE öldürülmez.
+EARLYOOM_ARGS="-m 5 -s 5 --avoid '^(kwin_wayland|kwin_x11|Xwayland|systemd|sddm|lightdm|pipewire|wireplumber)$' -r 60"
+EOF
+
+systemctl enable earlyoom 2>/dev/null || true
+log_sub "  ✅ ZRAM (%50 RAM, zstd) ve EarlyOOM donma karşıtı mimari aktif edildi."
+
+# ═══════════════════════════════════════════════════════════════════
+# 17. Windows Dual-Boot Donanım Saati (RTC) Uyumluluğu
+# ═══════════════════════════════════════════════════════════════════
+
+log_sub "Windows Dual-Boot donanım saati (RTC) uyumluluğu ayarlanıyor..."
+cat > /etc/adjtime << 'EOF'
+0.000000 0 0.000000
+0
+LOCAL
+EOF
+timedatectl set-local-rtc 1 --adjust-system-clock 2>/dev/null || true
+log_sub "  ✅ RTC donanım saati LOCAL moda ayarlandı (Windows 11 saat kayması önlendi)."
+
+# ═══════════════════════════════════════════════════════════════════
+# 18. Güvenlik Duvarı (UFW) Yapılandırması
+# ═══════════════════════════════════════════════════════════════════
+
+log_sub "UFW güvenlik duvarı varsayılan kuralları ayarlanıyor..."
+if [ -d /etc/ufw ]; then
+    sed -i 's/^DEFAULT_INPUT_POLICY=.*/DEFAULT_INPUT_POLICY="DROP"/' /etc/default/ufw 2>/dev/null || true
+    sed -i 's/^DEFAULT_OUTPUT_POLICY=.*/DEFAULT_OUTPUT_POLICY="ACCEPT"/' /etc/default/ufw 2>/dev/null || true
+    sed -i 's/^DEFAULT_FORWARD_POLICY=.*/DEFAULT_FORWARD_POLICY="DROP"/' /etc/default/ufw 2>/dev/null || true
+    sed -i 's/^ENABLED=.*/ENABLED=yes/' /etc/ufw/ufw.conf 2>/dev/null || true
+fi
+systemctl enable ufw 2>/dev/null || true
+log_sub "  ✅ UFW güvenlik duvarı (Gelen: DROP, Giden: ACCEPT) etkinleştirildi."
+
+# ═══════════════════════════════════════════════════════════════════
+# 19. Plymouth Teması ve Sıfır Göz Kırpma (Zero-Flicker) Initramfs
+# ═══════════════════════════════════════════════════════════════════
+
+log_sub "Plymouth Solis açılış teması varsayılan yapılıyor..."
+if [ -d /usr/share/plymouth/themes/solis ]; then
+    plymouth-set-default-theme -R solis 2>/dev/null || true
+fi
+
+log_sub "Initramfs tüm çekirdekler için üretiliyor (update-initramfs -c -k all)..."
+update-initramfs -c -k all 2>/dev/null || update-initramfs -u -k all 2>/dev/null || true
+log_sub "  ✅ Casper canlı önyükleme ve sıfır göz kırpma initramfs hazırlandı."
+
+# ═══════════════════════════════════════════════════════════════════
+# 20. Temizlik
 # ═══════════════════════════════════════════════════════════════════
 
 log_sub "Chroot temizliği yapılıyor..."

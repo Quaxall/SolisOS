@@ -89,6 +89,7 @@ plymouth-themes
 
 # ZRAM
 systemd-zram-generator
+zram-tools
 
 # PolicyKit (yetki yükseltme)
 policykit-1
@@ -119,4 +120,24 @@ gstreamer1.0-libav
 
 # Terminal Bilgi Aracı
 fastfetch
+
+# ─── Faz 5 Derin Sistem Mühendisliği Paketleri ───
+# AppImage Desteği (libfuse2t64)
+libfuse2t64
+fuse3
+
+# Donma Karşıtı Düşük Bellek Koruyucusu (EarlyOOM)
+earlyoom
+
+# Güvenlik Duvarı
+ufw
+
+# Dual-Boot Windows Algılama
+os-prober
+
+# Sanal Makine Entegrasyonu (QEMU, KVM, VirtualBox, VMware)
+qemu-guest-agent
+spice-vdagent
+open-vm-tools-desktop
+
 

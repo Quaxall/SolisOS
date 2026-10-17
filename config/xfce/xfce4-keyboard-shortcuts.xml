@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ═══════════════════════════════════════════════════════════════════
+  ☀️ Solis OS — Windows 11 Muscle Memory Keyboard Shortcuts
+  Kas Hafızası Kısayolları: Meta+Shift+S, Ctrl+Shift+Esc, Meta+E, Meta+V
+  ═══════════════════════════════════════════════════════════════════
+-->
+<channel name="xfce4-keyboard-shortcuts" version="1.0">
+  <property name="commands" type="empty">
+    <property name="custom" type="empty">
+      <!-- Meta + Shift + S: Bölgesel Ekran Görüntüsü (Win11 Snipping Tool) -->
+      <property name="&lt;Super&gt;&lt;Shift&gt;s" type="string" value="flameshot gui"/>
+      <property name="&lt;Super&gt;&lt;Shift&gt;S" type="string" value="flameshot gui"/>
+      
+      <!-- Ctrl + Shift + Esc: Görev Yöneticisi (Win11 Task Manager) -->
+      <property name="&lt;Primary&gt;&lt;Shift&gt;Escape" type="string" value="solis-optimizer"/>
+      
+      <!-- Meta + E: Dosya Yöneticisi (Win11 File Explorer) -->
+      <property name="&lt;Super&gt;e" type="string" value="thunar"/>
+      
+      <!-- Meta + V: Pano Geçmişi (Win11 Clipboard History) -->
+      <property name="&lt;Super&gt;v" type="string" value="xfce4-clipman-history"/>
+      
+      <!-- Meta + L: Ekranı Kilitle (Win11 Lock Screen) -->
+      <property name="&lt;Super&gt;l" type="string" value="xflock4"/>
+      
+      <!-- PrintScreen: Ekran Görüntüsü -->
+      <property name="Print" type="string" value="flameshot gui"/>
+    </property>
+  </property>
+  <property name="xfwm4" type="empty">
+    <property name="custom" type="empty">
+      <!-- Win11 Snap Assist Kısayolları -->
+      <property name="&lt;Super&gt;Left" type="string" value="tile_left_key"/>
+      <property name="&lt;Super&gt;Right" type="string" value="tile_right_key"/>
+      <property name="&lt;Super&gt;Up" type="string" value="maximize_window_key"/>
+      <property name="&lt;Super&gt;Down" type="string" value="hide_window_key"/>
+      <property name="&lt;Alt&gt;F4" type="string" value="close_window_key"/>
+    </property>
+  </property>
+</channel>
