@@ -597,6 +597,13 @@ fi
 
 log_sub "Solis OS özel WinUI 3 sistem araçları kuruluyor..."
 
+# PEP 668 Korumalı Python Paket Kurulumu
+if command -v pip3 &>/dev/null; then
+    log_sub "  PyQt-Fluent-Widgets ve psutil kuruluyor (--break-system-packages)..."
+    pip3 install --no-cache-dir --break-system-packages "PyQt-Fluent-Widgets[full]" psutil 2>/dev/null || \
+    pip3 install --no-cache-dir "PyQt-Fluent-Widgets[full]" psutil 2>/dev/null || true
+fi
+
 # Solis Welcome Center
 if [ -f "${PACKAGES_DIR}/solis-welcome/src/main.py" ]; then
     mkdir -p /usr/share/solis-welcome
@@ -605,8 +612,9 @@ if [ -f "${PACKAGES_DIR}/solis-welcome/src/main.py" ]; then
     
     if [ -f "${PACKAGES_DIR}/solis-welcome/solis-welcome.desktop" ]; then
         cp "${PACKAGES_DIR}/solis-welcome/solis-welcome.desktop" /usr/share/applications/
-        mkdir -p "${SKEL}/.config/autostart"
+        mkdir -p "${SKEL}/.config/autostart" /etc/xdg/autostart
         cp "${PACKAGES_DIR}/solis-welcome/solis-welcome.desktop" "${SKEL}/.config/autostart/"
+        cp "${PACKAGES_DIR}/solis-welcome/solis-welcome.desktop" /etc/xdg/autostart/
     fi
     log_sub "  ✅ Solis Welcome Center kuruldu ve autostart'a bağlandı."
 fi
@@ -631,11 +639,74 @@ echo 3 > /proc/sys/vm/drop_caches
 EOF
 chmod +x /usr/local/bin/solis-ram-clean
 
+# ─── Polkit Yetkilendirme Ajanı (GUI Root Parola Penceresi) ───
+cat > /usr/local/bin/solis-polkit-agent << 'EOF'
+#!/bin/bash
+for agent in \
+    /usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1 \
+    /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 \
+    /usr/libexec/polkit-kde-authentication-agent-1 \
+    /usr/bin/lxpolkit; do
+    if [ -x "$agent" ]; then
+        exec "$agent"
+    fi
+done
+EOF
+chmod +x /usr/local/bin/solis-polkit-agent
+
+mkdir -p /etc/xdg/autostart "${SKEL}/.config/autostart"
+if [ -f "${CONFIG_DIR}/user/skel/.config/autostart/polkit-agent.desktop" ]; then
+    cp "${CONFIG_DIR}/user/skel/.config/autostart/polkit-agent.desktop" /etc/xdg/autostart/
+    cp "${CONFIG_DIR}/user/skel/.config/autostart/polkit-agent.desktop" "${SKEL}/.config/autostart/"
+fi
+
+# ─── Calamares Kurulum Aracı & Masaüstü Kısayolu ───
+mkdir -p "${SKEL}/Desktop"
+if [ -f "${CONFIG_DIR}/user/skel/Desktop/install-solis.desktop" ]; then
+    cp "${CONFIG_DIR}/user/skel/Desktop/install-solis.desktop" "${SKEL}/Desktop/"
+    chmod +x "${SKEL}/Desktop/install-solis.desktop"
+fi
+
+if [ -d "${PACKAGES_DIR}/solis-installer-config/branding/solis" ]; then
+    mkdir -p /usr/share/calamares/branding/solis
+    cp -r "${PACKAGES_DIR}/solis-installer-config/branding/solis/"* /usr/share/calamares/branding/solis/
+    if [ -f "${BRANDING_DIR}/logo/solis-logo.svg" ]; then
+        cp "${BRANDING_DIR}/logo/solis-logo.svg" /usr/share/calamares/branding/solis/
+    fi
+    log_sub "  ✅ Calamares Solis OS Fluent teması entegre edildi."
+fi
+
+# ─── Fastfetch & Terminal Solis Karşılama ───
+mkdir -p "${SKEL}/.config/fastfetch"
+if [ -f "${CONFIG_DIR}/user/skel/.config/fastfetch/config.jsonc" ]; then
+    cp "${CONFIG_DIR}/user/skel/.config/fastfetch/config.jsonc" "${SKEL}/.config/fastfetch/"
+fi
+
+# .bashrc içine fastfetch ekle
+if ! grep -q "fastfetch" "${SKEL}/.bashrc" 2>/dev/null; then
+    cat >> "${SKEL}/.bashrc" << 'EOF'
+
+# ☀️ Solis OS Terminal Başlangıç Özeti
+if [ -x /usr/bin/fastfetch ] && [ -n "$PS1" ]; then
+    fastfetch
+fi
+EOF
+fi
+
+# ─── Donanım ve Çekirdek Servislerini Etkinleştir ───
+log_sub "Donanım, güç, ses ve ağ servisleri etkinleştiriliyor..."
+systemctl enable NetworkManager 2>/dev/null || true
+systemctl enable bluetooth 2>/dev/null || true
+systemctl enable power-profiles-daemon 2>/dev/null || true
+systemctl enable cups 2>/dev/null || true
+
 # /etc/skel şablonunu kullanıcının ev dizinine kopyala ve izinleri ata
+mkdir -p /home/solis/Desktop
 cp -r "${SKEL}/." /home/solis/
 chown -R solis:solis /home/solis/
+chmod +x /home/solis/Desktop/*.desktop 2>/dev/null || true
 
-log_sub "Canlı oturum, Wayland ve standalone uygulamalar başarıyla hazırlandı."
+log_sub "Canlı oturum, Wayland, donanım servisleri ve Calamares başarıyla hazırlandı."
 
 # ═══════════════════════════════════════════════════════════════════
 # 12. Flatpak Depoları

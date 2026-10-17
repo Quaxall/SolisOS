@@ -82,7 +82,7 @@ cleanup_on_exit() {
     log_info "Mount noktaları kaldırıldı."
 }
 
-trap cleanup_on_exit EXIT
+trap cleanup_on_exit EXIT ERR INT TERM
 
 # ═══════════════════════════════════════════════════════════════════
 # Faz 0: Başlangıç Banner

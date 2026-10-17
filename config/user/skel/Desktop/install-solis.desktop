@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Solis OS'u Bilgisayara Kur
+GenericName=Sistem Kurulum Sihirbazı
+Comment=Solis OS'u bilgisayarınıza kalıcı olarak kurun
+Exec=sudo -E calamares
+Icon=calamares
+Terminal=false
+Categories=System;
+StartupNotify=true
+X-AppStream-Ignore=true

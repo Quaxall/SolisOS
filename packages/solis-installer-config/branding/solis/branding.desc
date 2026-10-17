@@ -1,0 +1,32 @@
+---
+componentName:  solis
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 840px, 580px
+
+strings:
+    productName:         "Solis OS"
+    shortProductName:    "Solis"
+    version:             "0.2"
+    shortVersion:        "0.2"
+    versionedName:       "Solis OS 0.2 (Solstice)"
+    shortVersionedName:  "Solis 0.2"
+    bootloaderEntryName: "Solis OS"
+    productUrl:          "https://solisos.org"
+    supportUrl:          "https://solisos.org/support"
+    knownIssuesUrl:      "https://github.com/solis-os/solis-os/issues"
+    releaseNotesUrl:     "https://solisos.org/release-notes"
+
+images:
+    productLogo:         "solis-logo.svg"
+    productIcon:         "solis-logo.svg"
+
+style:
+   SidebarBackground:    "#161822"
+   SidebarText:          "#D1D5DB"
+   SidebarTextSelect:    "#FFB300"
+   SidebarTextHighlight: "#FFD54F"
+
+slideshow:               "show.qml"
+slideshowAPI:            2

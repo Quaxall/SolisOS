@@ -71,12 +71,15 @@ bash-completion
 software-properties-common
 apt-transport-https
 
-# Ses
-pulseaudio
+# Ses Mimarisi (Modern PipeWire)
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
 alsa-utils
 pavucontrol
 
-# Bluetooth (kullanıcı isteğine göre)
+# Bluetooth
 bluez
 blueman
 
@@ -90,3 +93,30 @@ systemd-zram-generator
 # PolicyKit (yetki yükseltme)
 policykit-1
 pkexec
+
+# ─── Faz 4 Donanım, Güç, Kodek ve Firmware Eklentileri ───
+# Kablosuz & GPU Firmware
+linux-firmware
+
+# Güç ve Parlaklık Yönetimi
+power-profiles-daemon
+brightnessctl
+
+# Yazıcı Desteği
+cups
+cups-client
+system-config-printer
+
+# Ek Dosya Sistemleri
+exfatprogs
+
+# Medya Kodekleri
+ffmpeg
+gstreamer1.0-plugins-good
+gstreamer1.0-plugins-bad
+gstreamer1.0-plugins-ugly
+gstreamer1.0-libav
+
+# Terminal Bilgi Aracı
+fastfetch
+

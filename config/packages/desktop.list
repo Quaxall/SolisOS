@@ -13,16 +13,22 @@ xfce4-power-manager
 xfce4-appfinder
 xfce4-notifyd
 
-# ─── Faz 3 Wayland & KWin Compositor (Akıcı Animasyonlar & Acrylic Blur) ───
+# ─── Faz 3 & 4 Wayland, XWayland & Compositor ───
 plasma-workspace-wayland
 plasma-desktop
 kwin-wayland
 kwin-wayland-backend-drm
+xwayland
 sddm
+xdg-desktop-portal
 xdg-desktop-portal-kde
+xdg-desktop-portal-gtk
+polkit-kde-agent-1
+policykit-1-gnome
 qt6-wayland
 pipewire-pulse
 wireplumber
+
 
 
 # Dosya Yöneticisi
