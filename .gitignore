@@ -1,0 +1,35 @@
+# Solis OS — Build çıktıları
+output/
+*.iso
+*.vdi
+
+# Docker
+.docker/
+
+# OS dosyaları
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Geçici dosyalar
+tmp/
+*.tmp
+*.bak
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build_py/
+*.whl
+venv/
+.venv/

@@ -1,0 +1,38 @@
+# ─────────────────────────────────────────────
+# Solis OS — Fluent Design Teknoloji Yığını
+# Windows 11 / WinUI 3 estetiği için gerekli
+# ─────────────────────────────────────────────
+
+# Compositor (Mica/Acrylic efektleri, rounded corners)
+picom
+
+# GTK Tema Bağımlılıkları
+gtk2-engines-murrine
+sassc
+gtk2-engines-pixbuf
+
+# Fontlar
+fonts-inter
+fonts-cascadia-code
+fonts-noto-color-emoji
+
+# İmleç Teması
+xcursor-themes
+
+# PySide6 bağımlılıkları (Solis araçları için)
+python3
+python3-pip
+python3-venv
+python3-gi
+python3-dbus
+
+# Kvantum (Qt temalaması — Calamares için)
+qt5-style-kvantum
+qt5-style-kvantum-themes
+
+# Diğer görsel bağımlılıklar
+papirus-icon-theme
+numix-icon-theme
+
+# Git (tema kurulum betikleri için)
+git

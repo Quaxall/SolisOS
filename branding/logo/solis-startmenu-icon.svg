@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="smGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE082"/>
+      <stop offset="40%" stop-color="#FFB300"/>
+      <stop offset="100%" stop-color="#FF6F00"/>
+    </linearGradient>
+    <filter id="smGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#FF6F00" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- 4 Fluent Rounded Tiles in Windows 11 style forming a modern Sun pattern -->
+  <g filter="url(#smGlow)">
+    <!-- Top-Left Tile -->
+    <rect x="8" y="8" width="21" height="21" rx="6" fill="url(#smGrad)"/>
+    <!-- Top-Right Tile -->
+    <rect x="35" y="8" width="21" height="21" rx="6" fill="url(#smGrad)"/>
+    <!-- Bottom-Left Tile -->
+    <rect x="8" y="35" width="21" height="21" rx="6" fill="url(#smGrad)"/>
+    <!-- Bottom-Right Tile -->
+    <rect x="35" y="35" width="21" height="21" rx="6" fill="url(#smGrad)"/>
+
+    <!-- Subtle Center Glow Sphere -->
+    <circle cx="32" cy="32" r="7" fill="#FFFFFF" opacity="0.9"/>
+  </g>
+</svg>

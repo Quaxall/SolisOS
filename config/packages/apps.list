@@ -1,0 +1,40 @@
+# ─────────────────────────────────────────────
+# Solis OS — Varsayılan Kullanıcı Uygulamaları
+# Günlük kullanıcı için gerekli uygulama seti
+# ─────────────────────────────────────────────
+
+# Web Tarayıcı
+firefox
+
+# Medya Oynatıcı
+mpv
+
+# Ekran Görüntüsü
+flameshot
+
+# Arşiv Yöneticisi
+file-roller
+
+# PDF Okuyucu
+evince
+
+# Hesap Makinesi
+gnome-calculator
+
+# Disk Analizi
+baobab
+
+# Sistem Monitörü (CLI)
+btop
+
+# Metin Editörü (zaten desktop.list'te: mousepad)
+# mousepad
+
+# Yazılım Merkezi (Flatpak)
+gnome-software
+flatpak
+gnome-software-plugin-flatpak
+
+# Kurulum Aracı
+calamares
+calamares-settings-ubuntu

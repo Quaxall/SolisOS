@@ -1,0 +1,53 @@
+# ─────────────────────────────────────────────
+# Solis OS — XFCE4 Masaüstü Ortamı Paketleri
+# Minimal XFCE4 kurulumu + Win11 düzeni için
+# ─────────────────────────────────────────────
+
+# XFCE Çekirdek
+xfce4-session
+xfwm4
+xfce4-panel
+xfdesktop4
+xfce4-settings
+xfce4-power-manager
+xfce4-appfinder
+xfce4-notifyd
+
+# Dosya Yöneticisi
+thunar
+thunar-volman
+thunar-archive-plugin
+thunar-media-tags-plugin
+gvfs
+gvfs-backends
+
+# Panel Eklentileri (Windows 11 düzeni için)
+xfce4-whiskermenu-plugin
+xfce4-docklike-plugin
+xfce4-statusnotifier-plugin
+xfce4-pulseaudio-plugin
+xfce4-datetime-plugin
+xfce4-clipman-plugin
+
+# Ekran Yöneticisi (Login Screen)
+lightdm
+lightdm-gtk-greeter
+lightdm-gtk-greeter-settings
+
+# X11 / Ekran
+xorg
+xserver-xorg-core
+xserver-xorg-input-all
+xserver-xorg-video-all
+xinit
+x11-utils
+
+# Ekran kilidi
+light-locker
+
+# Ek XFCE Araçları
+xfce4-screenshooter
+xfce4-taskmanager
+xfce4-terminal
+mousepad
+ristretto

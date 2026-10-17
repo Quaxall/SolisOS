@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Solis OS Theme
+Description=Fluent Design animated solar boot splash for Solis OS
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/solis-theme
+ScriptFile=/usr/share/plymouth/themes/solis-theme/solis-theme.script

@@ -1,0 +1,20 @@
+# ─────────────────────────────────────────────
+# Solis OS — Devre Dışı Bırakılacak Servisler
+# Her satır bir systemd servis adı
+# ─────────────────────────────────────────────
+
+# Modem yönetimi (çoğu masaüstü için gereksiz)
+ModemManager.service
+
+# Otomatik güncelleme (Solis Welcome'dan kontrol edilir)
+apt-daily.service
+apt-daily.timer
+apt-daily-upgrade.service
+apt-daily-upgrade.timer
+
+# Ubuntu telemetri/raporlama
+ubuntu-report.service
+
+# Crash raporlama
+apport.service
+whoopsie.service

@@ -1,0 +1,74 @@
+# ═══════════════════════════════════════════════════════════════════
+# ☀️ Solis OS — Plymouth Boot Splash Script
+# Modern animated solar boot experience
+# ═══════════════════════════════════════════════════════════════════
+
+# Ekran boyutlarını al
+screen.w = Window.GetWidth();
+screen.h = Window.GetHeight();
+
+# Arka plan (Derin Koyu #0d0e15)
+Window.SetBackgroundTopColor(0.05, 0.05, 0.08);
+Window.SetBackgroundBottomColor(0.05, 0.05, 0.08);
+
+# Logo
+logo.image = Image("solis-logo.png");
+if (logo.image) {
+    logo.sprite = Sprite(logo.image);
+    logo.x = (screen.w - logo.image.GetWidth()) / 2;
+    logo.y = (screen.h - logo.image.GetHeight()) / 2 - 40;
+    logo.sprite.SetPosition(logo.x, logo.y, 10);
+    logo.sprite.SetOpacity(1.0);
+}
+
+# Başlık Metni
+title.image = Image.Text("Solis OS", 1.0, 0.85, 0.3, 1.0, "Inter Medium 24");
+if (title.image) {
+    title.sprite = Sprite(title.image);
+    title.x = (screen.w - title.image.GetWidth()) / 2;
+    title.y = (screen.h / 2) + 70;
+    title.sprite.SetPosition(title.x, title.y, 10);
+    title.sprite.SetOpacity(0.9);
+}
+
+# Alt Slogan
+subtitle.image = Image.Text("Solstice · Loading...", 0.65, 0.68, 0.75, 0.8, "Inter Regular 12");
+if (subtitle.image) {
+    subtitle.sprite = Sprite(subtitle.image);
+    subtitle.x = (screen.w - subtitle.image.GetWidth()) / 2;
+    subtitle.y = (screen.h / 2) + 105;
+    subtitle.sprite.SetPosition(subtitle.x, subtitle.y, 10);
+    subtitle.sprite.SetOpacity(0.7);
+}
+
+# İlerleme Çubuğu (Fluent İnce Çubuk)
+bar_width = 240;
+bar_height = 4;
+bar_x = (screen.w - bar_width) / 2;
+bar_y = (screen.h / 2) + 140;
+
+progress_bg.image = Image.Fill(bar_width, bar_height, 0.15, 0.17, 0.22, 0.8);
+progress_bg.sprite = Sprite(progress_bg.image);
+progress_bg.sprite.SetPosition(bar_x, bar_y, 5);
+
+progress_fg.orig_image = Image.Fill(bar_width, bar_height, 1.0, 0.7, 0.0, 1.0);
+progress_fg.sprite = Sprite();
+progress_fg.sprite.SetPosition(bar_x, bar_y, 6);
+
+# İlerleme fonksiyonu
+fun progress_callback(duration, progress) {
+    curr_w = Math.Int(bar_width * progress);
+    if (curr_w > 0) {
+        progress_fg.image = progress_fg.orig_image.Scale(curr_w, bar_height);
+        progress_fg.sprite.SetImage(progress_fg.image);
+    }
+}
+Plymouth.SetBootProgressFunction(progress_callback);
+
+# Çıkış animasyonu
+fun quit_callback() {
+    logo.sprite.SetOpacity(0);
+    title.sprite.SetOpacity(0);
+    subtitle.sprite.SetOpacity(0);
+}
+Plymouth.SetQuitFunction(quit_callback);

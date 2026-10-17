@@ -1,0 +1,13 @@
+PRETTY_NAME="Solis OS 0.2 (Solstice)"
+NAME="Solis OS"
+VERSION_ID="0.2"
+VERSION="0.2 (Solstice)"
+VERSION_CODENAME=solstice
+ID=solis
+ID_LIKE=ubuntu
+HOME_URL="https://solisos.org"
+SUPPORT_URL="https://solisos.org/support"
+BUG_REPORT_URL="https://github.com/solis-os/solis-os/issues"
+PRIVACY_POLICY_URL="https://solisos.org/privacy"
+UBUNTU_CODENAME=noble
+LOGO=solis-logo

@@ -1,0 +1,76 @@
+name: ☀️ Solis OS — ISO Build Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'LICENSE'
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'GitHub Release olarak yayınlansın mı?'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build-iso:
+    name: 💿 Hibrit ISO Üretimi (Ubuntu 24.04 Tabanlı)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+
+    steps:
+      - name: 📥 Depoyu Klonla
+        uses: actions/checkout@v4
+
+      - name: 💾 Disk Alanını Boşalt (Gereksiz araçları temizle)
+        run: |
+          echo "Disk alanı temizleniyor..."
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache
+          df -h
+
+      - name: 🛠️ Build Bağımlılıklarını Kur
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            debootstrap \
+            squashfs-tools \
+            xorriso \
+            grub-pc-bin \
+            grub-efi-amd64-bin \
+            grub-efi-amd64-signed \
+            shim-signed \
+            mtools \
+            dosfstools \
+            isolinux \
+            syslinux-utils \
+            binutils \
+            curl \
+            wget \
+            git
+
+      - name: 🚀 Solis OS ISO İnşa Betiğini Çalıştır
+        run: |
+          chmod +x build/*.sh scripts/*.sh
+          sudo mkdir -p /build/output
+          sudo ./build/build-solisos.sh
+
+      - name: 📋 Çıktı Dosyalarını Doğrula
+        run: |
+          ls -lh /build/output/
+          cat /build/output/SHA256SUMS
+
+      - name: 📤 ISO Kalıbını ve SHA256 Dosyasını Artifact Olarak Yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: solis-os-0.2-solstice-amd64
+          path: |
+            /build/output/*.iso
+            /build/output/SHA256SUMS
+          retention-days: 7
+          if-no-files-found: error

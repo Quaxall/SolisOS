@@ -1,0 +1,92 @@
+# ─────────────────────────────────────────────
+# Solis OS — Temel Sistem Paketleri
+# Her satır bir paket adı, # ile yorum satırı
+# ─────────────────────────────────────────────
+
+# Çekirdek
+linux-image-generic
+linux-headers-generic
+
+# Önyükleyici
+grub-efi-amd64
+grub-pc-bin
+shim-signed
+
+# Temel Sistem
+systemd
+dbus
+udev
+sudo
+bash
+coreutils
+util-linux
+passwd
+adduser
+apt
+dpkg
+gnupg
+
+# Ağ
+network-manager
+wpasupplicant
+wireless-tools
+net-tools
+iputils-ping
+curl
+wget
+ca-certificates
+
+# Dosya Sistemi
+e2fsprogs
+dosfstools
+ntfs-3g
+btrfs-progs
+
+# Donanım
+pciutils
+usbutils
+lshw
+dmidecode
+
+# Yerelleştirme
+locales
+console-setup
+keyboard-configuration
+
+# Sıkıştırma
+zstd
+xz-utils
+gzip
+bzip2
+unzip
+zip
+
+# Sistem Araçları
+htop
+nano
+less
+rsync
+man-db
+bash-completion
+software-properties-common
+apt-transport-https
+
+# Ses
+pulseaudio
+alsa-utils
+pavucontrol
+
+# Bluetooth (kullanıcı isteğine göre)
+bluez
+blueman
+
+# Plymouth (açılış ekranı)
+plymouth
+plymouth-themes
+
+# ZRAM
+systemd-zram-generator
+
+# PolicyKit (yetki yükseltme)
+policykit-1
+pkexec

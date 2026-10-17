@@ -1,0 +1,33 @@
+# ─────────────────────────────────────────────
+# Solis OS — Kaldırılacak / Engellenecek Paketler
+# Bloatware, telemetri ve gereksiz servisler
+# ─────────────────────────────────────────────
+
+# Snap paket sistemi (ağır, yavaş başlatma)
+snapd
+
+# Ubuntu Pro telemetri
+ubuntu-advantage-tools
+ubuntu-pro-client
+
+# Hata raporlama servisleri
+apport
+whoopsie
+
+# İstatistik gönderimi
+popularity-contest
+
+# Otomatik güncellemeler (Solis Welcome'dan kontrol edilir)
+unattended-upgrades
+
+# Gereksiz GNOME servisleri
+gnome-initial-setup
+gnome-online-accounts
+
+# Gereksiz oyunlar
+gnome-mines
+gnome-sudoku
+aisleriot
+
+# Telemetri
+ubuntu-report
