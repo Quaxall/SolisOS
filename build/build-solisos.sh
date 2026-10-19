@@ -295,11 +295,23 @@ cat > "${ISO_STAGING}/boot/grub/grub.cfg" << 'GRUB_EOF'
 set timeout=10
 set default=0
 
+# Dosya sistemi ve arama modülleri
+insmod part_gpt
+insmod part_msdos
+insmod iso9660
+insmod fat
+insmod search
+insmod search_fs_file
+
+# Canlı Medya Kök Aygıtını Bul (CD/DVD veya USB)
+search --no-floppy --set=root --file /casper/vmlinuz
+
 # Grafik mod ve tema
 insmod all_video
 insmod gfxterm
 insmod png
 insmod jpeg
+insmod font
 
 terminal_output gfxterm
 
@@ -315,23 +327,27 @@ set menu_color_highlight=black/light-gray
 # ─── Ana Menü ───
 menuentry "☀️ Solis OS — Canlı Masaüstü Oturumu Başlat (Live)" {
     set gfxpayload=keep
+    search --no-floppy --set=root --file /casper/vmlinuz
     linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash vt.global_cursor_default=0 loglevel=3 rd.udev.log_priority=3 systemd.show_status=auto --- 
     initrd /casper/initrd
 }
 
 menuentry "☀️ Solis OS — Güvenli Grafik Modu (nomodeset)" {
     set gfxpayload=keep
+    search --no-floppy --set=root --file /casper/vmlinuz
     linux /casper/vmlinuz boot=casper username=solis hostname=solis nomodeset quiet splash vt.global_cursor_default=0 loglevel=3 ---
     initrd /casper/initrd
 }
 
 menuentry "🔧 Solis OS — Doğrudan Sistem Kurulumu (Calamares)" {
     set gfxpayload=keep
+    search --no-floppy --set=root --file /casper/vmlinuz
     linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash vt.global_cursor_default=0 loglevel=3 rd.udev.log_priority=3 systemd.show_status=auto solis-installer ---
     initrd /casper/initrd
 }
 
 menuentry "Bellek Testi (memtest86+)" {
+    search --no-floppy --set=root --file /casper/vmlinuz
     linux /boot/memtest86+.bin
 }
 
@@ -352,8 +368,8 @@ log_info "BIOS boot imajı oluşturuluyor..."
 grub-mkstandalone \
     --format=i386-pc \
     --output="${BUILD_DIR}/bios.img" \
-    --install-modules="linux normal iso9660 biosdisk memdisk search tar ls" \
-    --modules="linux normal iso9660 biosdisk search" \
+    --install-modules="linux normal iso9660 biosdisk memdisk search search_fs_file search_label search_fs_uuid part_msdos part_gpt all_video gfxterm gfxmenu png jpeg font test tar ls fat" \
+    --modules="linux normal iso9660 biosdisk search search_fs_file part_msdos part_gpt" \
     --locales="" \
     --fonts="" \
     "boot/grub/grub.cfg=${ISO_STAGING}/boot/grub/grub.cfg"
@@ -367,8 +383,8 @@ log_info "UEFI boot imajı oluşturuluyor..."
 grub-mkstandalone \
     --format=x86_64-efi \
     --output="${BUILD_DIR}/bootx64.efi" \
-    --install-modules="linux normal iso9660 memdisk search tar ls efi_gop efi_uga" \
-    --modules="linux normal iso9660 search" \
+    --install-modules="linux normal iso9660 memdisk search search_fs_file search_label search_fs_uuid part_msdos part_gpt all_video efi_gop efi_uga gfxterm gfxmenu png jpeg font test tar ls fat" \
+    --modules="linux normal iso9660 search search_fs_file part_msdos part_gpt" \
     --locales="" \
     --fonts="" \
     "boot/grub/grub.cfg=${ISO_STAGING}/boot/grub/grub.cfg"
@@ -383,8 +399,10 @@ mkfs.vfat "${EFI_IMG}"
 # EFI dosyalarını imaja kopyala
 MTOOLS_SKIP_CHECK=1 mmd -i "${EFI_IMG}" ::/EFI ::/EFI/boot
 MTOOLS_SKIP_CHECK=1 mcopy -i "${EFI_IMG}" "${BUILD_DIR}/bootx64.efi" ::/EFI/boot/bootx64.efi
+MTOOLS_SKIP_CHECK=1 mcopy -i "${EFI_IMG}" "${ISO_STAGING}/boot/grub/grub.cfg" ::/EFI/boot/grub.cfg 2>/dev/null || true
 
 cp "${BUILD_DIR}/bootx64.efi" "${ISO_STAGING}/EFI/boot/bootx64.efi"
+cp "${ISO_STAGING}/boot/grub/grub.cfg" "${ISO_STAGING}/EFI/boot/grub.cfg" 2>/dev/null || true
 
 log_info "UEFI boot imajı hazır."
 
