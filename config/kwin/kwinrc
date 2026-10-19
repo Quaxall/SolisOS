@@ -5,13 +5,12 @@
 
 [Compositing]
 Backend=OpenGL
-GLCore=true
 GLPlatformInterface=egl
 GLPreferBufferSwap=a
 HiddenPreviews=5
 OpenGLIsUnsafe=false
 WindowsBlockCompositing=true
-MaxFPS=144
+MaxFPS=60
 
 [Plugins]
 blurEnabled=true

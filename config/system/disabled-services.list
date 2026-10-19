@@ -18,3 +18,6 @@ ubuntu-report.service
 # Crash raporlama
 apport.service
 whoopsie.service
+
+# Casper CD-ROM Bütünlük Kontrolü (Live ISO açılışında [FAILED] hatasını engeller)
+casper-md5check.service

@@ -20,6 +20,7 @@ kwin-wayland
 kwin-wayland-backend-drm
 xwayland
 sddm
+sddm-theme-breeze
 xdg-desktop-portal
 xdg-desktop-portal-kde
 xdg-desktop-portal-gtk

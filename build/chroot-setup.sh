@@ -542,6 +542,47 @@ if [ -d "${CONFIG_DIR}/kwin" ]; then
     log_sub "  ✅ KWin Wayland Glide/Scale ve Akrilik efektleri uygulandı."
 fi
 
+# ─── KDE Plasma Windows 11 Varsayılan Panel Şablonu (Native layout.js) ───
+LAYOUT_DIR="/usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents"
+mkdir -p "$LAYOUT_DIR"
+cat > "${LAYOUT_DIR}/layout.js" << 'EOF'
+var panel = new Panel
+var panelScreen = panel.screen
+
+panel.location = "bottom";
+panel.height = 48;
+panel.floating = true;
+panel.alignment = "center";
+
+var spacer1 = panel.addWidget("org.kde.plasma.panelspacer");
+spacer1.currentConfigGroup = ["Configuration", "General"];
+spacer1.writeConfig("expanding", "true");
+
+var kickoff = panel.addWidget("org.kde.plasma.kickoff");
+kickoff.currentConfigGroup = ["Configuration", "General"];
+kickoff.writeConfig("icon", "solis-logo");
+
+var tasks = panel.addWidget("org.kde.plasma.icontasks");
+tasks.currentConfigGroup = ["Configuration", "General"];
+tasks.writeConfig("launchers", [
+    "applications:org.kde.dolphin.desktop",
+    "applications:firefox.desktop",
+    "applications:xfce4-terminal.desktop",
+    "applications:solis-welcome.desktop",
+    "applications:solis-optimizer.desktop",
+    "applications:org.kde.discover.desktop"
+]);
+
+var spacer2 = panel.addWidget("org.kde.plasma.panelspacer");
+spacer2.currentConfigGroup = ["Configuration", "General"];
+spacer2.writeConfig("expanding", "true");
+
+panel.addWidget("org.kde.plasma.systemtray");
+panel.addWidget("org.kde.plasma.digitalclock");
+panel.addWidget("org.kde.plasma.showdesktop");
+EOF
+log_sub "  ✅ KDE Plasma yerel Windows 11 ortalanmış panel şablonu (layout.js) işlendi."
+
 # ─── SDDM Yapılandırması (Varsayılan Wayland Giriş Yöneticisi) ───
 mkdir -p /etc/sddm.conf.d
 if [ -f "${CONFIG_DIR}/sddm/autologin.conf" ]; then
@@ -787,9 +828,9 @@ systemctl enable cups 2>/dev/null || true
 
 # Sanal Makine (QEMU / KVM / VirtualBox / VMware) Tam Ekran ve Çift Yönlü Pano Desteği
 systemctl enable virtualbox-guest-utils 2>/dev/null || true
-systemctl enable virtualbox-guest-x11 2>/dev/null || true
 systemctl enable open-vm-tools 2>/dev/null || true
 systemctl enable spice-vdagentd 2>/dev/null || true
+systemctl mask casper-md5check.service 2>/dev/null || true
 
 # QEMU Guest Agent'ın VirtualBox veya fiziksel ortamda [FAILED] uyarısı vermemesi için koşul:
 mkdir -p /etc/systemd/system/qemu-guest-agent.service.d

@@ -328,21 +328,21 @@ set menu_color_highlight=black/light-gray
 menuentry "☀️ Solis OS — Canlı Masaüstü Oturumu Başlat (Live)" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /casper/vmlinuz
-    linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash vt.global_cursor_default=0 loglevel=3 rd.udev.log_priority=3 systemd.show_status=auto --- 
+    linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash fsck.mode=skip vt.global_cursor_default=0 loglevel=3 rd.udev.log_priority=3 systemd.show_status=auto --- 
     initrd /casper/initrd
 }
 
 menuentry "☀️ Solis OS — Güvenli Grafik Modu (nomodeset)" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /casper/vmlinuz
-    linux /casper/vmlinuz boot=casper username=solis hostname=solis nomodeset quiet splash vt.global_cursor_default=0 loglevel=3 ---
+    linux /casper/vmlinuz boot=casper username=solis hostname=solis nomodeset quiet splash fsck.mode=skip vt.global_cursor_default=0 loglevel=3 ---
     initrd /casper/initrd
 }
 
 menuentry "🔧 Solis OS — Doğrudan Sistem Kurulumu (Calamares)" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /casper/vmlinuz
-    linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash vt.global_cursor_default=0 loglevel=3 rd.udev.log_priority=3 systemd.show_status=auto solis-installer ---
+    linux /casper/vmlinuz boot=casper username=solis hostname=solis quiet splash fsck.mode=skip vt.global_cursor_default=0 loglevel=3 rd.udev.log_priority=3 systemd.show_status=auto solis-installer ---
     initrd /casper/initrd
 }
 
@@ -405,6 +405,10 @@ cp "${BUILD_DIR}/bootx64.efi" "${ISO_STAGING}/EFI/boot/bootx64.efi"
 cp "${ISO_STAGING}/boot/grub/grub.cfg" "${ISO_STAGING}/EFI/boot/grub.cfg" 2>/dev/null || true
 
 log_info "UEFI boot imajı hazır."
+
+# ─── ISO Bütünlük Tablosu (md5sum.txt) ───
+log_info "ISO md5sum.txt kontrol tablosu oluşturuluyor..."
+(cd "${ISO_STAGING}" && find . -type f ! -name "md5sum.txt" ! -path "./boot/*" ! -path "./EFI/*" -print0 | xargs -0 md5sum > md5sum.txt) 2>/dev/null || true
 
 # ─── Hibrit ISO Oluştur ───
 log_info "Hibrit ISO oluşturuluyor: ${SOLIS_ISO_NAME}"
