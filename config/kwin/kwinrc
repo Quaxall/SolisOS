@@ -49,6 +49,7 @@ ButtonsOnLeft=
 ButtonsOnRight=IAX
 CloseOnDoubleClickOnMenu=false
 ShowToolTips=true
+theme=Breeze
 
 # ─── Snap Assist & Pencere Hizalama ───
 [Windows]

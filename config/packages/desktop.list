@@ -32,6 +32,8 @@ wireplumber
 
 
 # Dosya Yöneticisi
+dolphin
+kio-extras
 thunar
 thunar-volman
 thunar-archive-plugin

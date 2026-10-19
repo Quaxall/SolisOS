@@ -1,0 +1,27 @@
+[General]
+ColorScheme=BreezeDark
+Name=Breeze Dark
+fixed=Monospace,10,-1,5,50,0,0,0,0,0
+font=Inter,10,-1,5,50,0,0,0,0,0
+menuFont=Inter,10,-1,5,50,0,0,0,0,0
+smallestReadableFont=Inter,8,-1,5,50,0,0,0,0,0
+toolBarFont=Inter,9,-1,5,50,0,0,0,0,0
+widgetStyle=Breeze
+
+[Icons]
+Theme=Fluent-dark
+
+[KDE]
+ShowDeleteCommand=true
+SingleClick=false
+
+[KScreen]
+ScaleFactor=1
+
+[WM]
+activeBackground=30,34,48
+activeBlend=255,179,0
+activeForeground=255,255,255
+inactiveBackground=20,22,32
+inactiveBlend=40,44,56
+inactiveForeground=156,163,175

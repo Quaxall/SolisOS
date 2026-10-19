@@ -34,6 +34,8 @@ btop
 gnome-software
 flatpak
 gnome-software-plugin-flatpak
+plasma-discover
+plasma-discover-backend-flatpak
 
 # Kurulum Aracı
 calamares

@@ -410,7 +410,7 @@ class SolisWelcomeApp(QMainWindow):
         dc_info = QLabel("Ek donanım ve tescilli sürücüleri (NVIDIA, Wi-Fi) kontrol edin.")
         dc_info.setStyleSheet("color: #d1d5db; font-size: 13px;")
         dc_btn = QPushButton("Sürücü Yöneticisini Aç")
-        dc_btn.clicked.connect(lambda: self.run_command("software-properties-gtk --open-tab=4"))
+        dc_btn.clicked.connect(self.launch_driver_manager)
         dc_layout.addWidget(dc_info)
         dc_layout.addStretch()
         dc_layout.addWidget(dc_btn)
@@ -458,9 +458,9 @@ class SolisWelcomeApp(QMainWindow):
         layout.addWidget(preinstalled_card)
         
         # Harici Yazılım Merkezi Aç Butonu
-        store_btn = QPushButton("🛍️ GNOME Yazılım Merkezini Aç (Flatpak Destekli)")
+        store_btn = QPushButton("🛍️ Yazılım Merkezini Aç (Discover / Flatpak)")
         store_btn.setObjectName("PrimaryButton")
-        store_btn.clicked.connect(lambda: self.run_command("gnome-software"))
+        store_btn.clicked.connect(self.launch_software_store)
         layout.addWidget(store_btn)
         
         layout.addStretch()
@@ -552,6 +552,26 @@ class SolisWelcomeApp(QMainWindow):
             self.run_command("pkexec calamares")
         else:
             QMessageBox.information(self, "Bilgi", "Calamares kurulum aracı Live ISO ortamında çalıştırılabilir.")
+
+    def launch_driver_manager(self):
+        for cmd in [
+            "software-properties-gtk --open-tab=4",
+            "software-properties-qt --open-tab=4",
+            "pkexec ubuntu-drivers install",
+            "systemsettings kcm_driver_manager"
+        ]:
+            binary = cmd.split()[0]
+            if shutil.which(binary):
+                self.run_command(cmd)
+                return
+        QMessageBox.warning(self, "Bilgi", "Sisteminizde ek tescilli sürücü gerektiren donanım bulunamadı veya sürücü aracı yüklenmedi.")
+
+    def launch_software_store(self):
+        for cmd in ["plasma-discover", "gnome-software"]:
+            if shutil.which(cmd):
+                self.run_command(cmd)
+                return
+        QMessageBox.warning(self, "Bilgi", "Yazılım merkezi uygulaması bulunamadı.")
 
 
 def main():

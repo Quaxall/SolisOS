@@ -141,6 +141,18 @@ if [ -n "$FLUENT_PKGS" ]; then
     }
 fi
 
+# ─── Mozilla Team PPA (Snap'siz Yerel .deb Firefox) ───
+log_sub "Mozilla Team PPA yapılandırılıyor (Snap'siz yerel .deb Firefox)..."
+add-apt-repository -y ppa:mozillateam/ppa 2>/dev/null || true
+
+cat > /etc/apt/preferences.d/mozilla-firefox << 'EOF'
+Package: firefox*
+Pin: release o=LP-PPA-mozillateam
+Pin-Priority: 1001
+EOF
+
+apt-get update -qq 2>/dev/null || true
+
 # ─── Uygulama paketleri ───
 log_sub "Varsayılan uygulamalar kuruluyor (apps.list)..."
 APP_PKGS=$(parse_package_list "${CONFIG_DIR}/packages/apps.list")
@@ -345,9 +357,37 @@ if [ -f "${CONFIG_DIR}/picom/picom.conf" ]; then
     cp "${CONFIG_DIR}/picom/picom.conf" /etc/xdg/picom/picom.conf
 fi
 
-# ─── 2. GTK3 CSS (Windows 11 Floating Taskbar & Yuvarlatılmış Köşeler) ───
-if [ -f "${CONFIG_DIR}/user/skel/.config/gtk-3.0/gtk.css" ]; then
-    cp "${CONFIG_DIR}/user/skel/.config/gtk-3.0/gtk.css" "${SKEL}/.config/gtk-3.0/gtk.css"
+# ─── 2. Solis OS Kullanıcı ve Masaüstü Şablonları (/etc/skel & /etc/xdg) ───
+if [ -d "${CONFIG_DIR}/user/skel" ]; then
+    cp -a "${CONFIG_DIR}/user/skel/." "${SKEL}/" 2>/dev/null || true
+fi
+
+# KDE Plasma & GTK Sistem Geneli XDG Şablonları
+mkdir -p /etc/xdg/gtk-3.0 /etc/xdg/gtk-4.0
+if [ -f "${CONFIG_DIR}/user/skel/.config/gtk-3.0/settings.ini" ]; then
+    cp "${CONFIG_DIR}/user/skel/.config/gtk-3.0/settings.ini" /etc/xdg/gtk-3.0/settings.ini
+fi
+if [ -f "${CONFIG_DIR}/user/skel/.config/gtk-4.0/settings.ini" ]; then
+    cp "${CONFIG_DIR}/user/skel/.config/gtk-4.0/settings.ini" /etc/xdg/gtk-4.0/settings.ini
+fi
+if [ -f "${CONFIG_DIR}/user/skel/.config/kdeglobals" ]; then
+    cp "${CONFIG_DIR}/user/skel/.config/kdeglobals" /etc/xdg/kdeglobals
+fi
+if [ -f "${CONFIG_DIR}/user/skel/.config/plasmarc" ]; then
+    cp "${CONFIG_DIR}/user/skel/.config/plasmarc" /etc/xdg/plasmarc
+fi
+if [ -f "${CONFIG_DIR}/user/skel/.config/kcminputrc" ]; then
+    cp "${CONFIG_DIR}/user/skel/.config/kcminputrc" /etc/xdg/kcminputrc
+fi
+
+# ─── 2b. GTK3 / GTK4 / Libadwaita Pencere Kontrolleri (Küçült, Büyüt, Kapat Butonları) ───
+mkdir -p /etc/dconf/db/local.d
+cat > /etc/dconf/db/local.d/01-solis-window-buttons << 'EOF'
+[org/gnome/desktop/wm/preferences]
+button-layout='appmenu:minimize,maximize,close'
+EOF
+if command -v dconf &>/dev/null; then
+    dconf update 2>/dev/null || true
 fi
 
 # ─── 3. Ortalanmış Windows 11 Görev Çubuğu (XFCE Panel) ───
@@ -746,17 +786,26 @@ systemctl enable power-profiles-daemon 2>/dev/null || true
 systemctl enable cups 2>/dev/null || true
 
 # Sanal Makine (QEMU / KVM / VirtualBox / VMware) Tam Ekran ve Çift Yönlü Pano Desteği
-systemctl enable qemu-guest-agent 2>/dev/null || true
-systemctl enable spice-vdagentd 2>/dev/null || true
+systemctl enable virtualbox-guest-utils 2>/dev/null || true
+systemctl enable virtualbox-guest-x11 2>/dev/null || true
 systemctl enable open-vm-tools 2>/dev/null || true
-systemctl enable vmtoolsd 2>/dev/null || true
+systemctl enable spice-vdagentd 2>/dev/null || true
+
+# QEMU Guest Agent'ın VirtualBox veya fiziksel ortamda [FAILED] uyarısı vermemesi için koşul:
+mkdir -p /etc/systemd/system/qemu-guest-agent.service.d
+cat > /etc/systemd/system/qemu-guest-agent.service.d/condition.conf << 'EOF'
+[Unit]
+ConditionPathExists=/dev/virtio-ports/org.qemu.guest_agent.0
+EOF
+systemctl enable qemu-guest-agent 2>/dev/null || true
+
 if [ -f /etc/xdg/autostart/spice-vdagent.desktop ]; then
     cp /etc/xdg/autostart/spice-vdagent.desktop "${SKEL}/.config/autostart/" 2>/dev/null || true
 fi
 
 # /etc/skel şablonunu kullanıcının ev dizinine kopyala ve izinleri ata
 mkdir -p /home/solis/Desktop
-cp -r "${SKEL}/." /home/solis/
+cp -a "${SKEL}/." /home/solis/
 chown -R solis:solis /home/solis/
 chmod +x /home/solis/Desktop/*.desktop 2>/dev/null || true
 
